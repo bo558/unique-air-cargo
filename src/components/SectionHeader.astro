@@ -1,0 +1,73 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  accent?: string;
+  lead?: string;
+  /** `split` puts the lead in a second column on wide screens */
+  layout?: 'stack' | 'split';
+  as?: 'h2' | 'h3';
+  id?: string;
+  class?: string;
+}
+
+const { eyebrow, title, accent, lead, layout = 'stack', as: Tag = 'h2', id, class: className } = Astro.props;
+---
+
+<header class:list={['sh', `sh--${layout}`, className]} data-reveal>
+  <div class="sh__main">
+    {eyebrow && <p class="eyebrow sh__eyebrow">{eyebrow}</p>}
+    <Tag class="h2 sh__title" id={id}>
+      {title}
+      {accent && <em class="sh__accent"> {accent}</em>}
+    </Tag>
+  </div>
+  {
+    (lead || Astro.slots.has('default')) && (
+      <div class="sh__aside">
+        {lead && <p class="lead">{lead}</p>}
+        <slot />
+      </div>
+    )
+  }
+</header>
+
+<style>
+  .sh {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: clamp(2.5rem, 2rem + 2.5vw, 4.5rem);
+  }
+
+  .sh__eyebrow {
+    margin-bottom: 1.25rem;
+  }
+
+  .sh__title {
+    max-width: 20ch;
+  }
+
+  .sh__accent {
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  :global(.surface-ink) .sh__accent {
+    color: var(--brand-300);
+  }
+
+  .sh__aside {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+    max-width: 52ch;
+  }
+
+  @media (min-width: 960px) {
+    .sh--split {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      align-items: end;
+      gap: 4rem;
+    }
+  }
+</style>

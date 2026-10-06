@@ -1,0 +1,472 @@
+---
+import { withBase } from '@/utils/paths';
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { services, categories, defaultProcess, getService, serviceHref, type Service } from '@/data/services';
+import { site } from '@/data/site';
+
+export const getStaticPaths = (() =>
+  services.map((service) => ({ params: { slug: service.slug }, props: { service } }))) satisfies GetStaticPaths;
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+const related = service.related.map(getService).filter((s): s is Service => Boolean(s));
+const steps = service.process ?? defaultProcess;
+const quoteHref = withBase(`/iletisim?hizmet=${service.slug}#teklif`);
+
+const toc = [
+  { id: 'genel-bakis', label: 'Genel bakış' },
+  { id: 'kullanim', label: 'Kullanım alanları' },
+  { id: 'avantajlar', label: 'Avantajlar' },
+  { id: 'surec', label: 'Operasyon süreci' },
+  { id: 'kabiliyetler', label: 'Kabiliyetler' },
+];
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.title,
+  serviceType: 'Charter uçuş',
+  description: service.seo.description,
+  url: new URL(serviceHref(service.slug), Astro.site).href,
+  provider: { '@id': `${site.url}/#organization` },
+  areaServed: 'Worldwide',
+};
+---
+
+<BaseLayout title={service.seo.title} description={service.seo.description} image={service.image} jsonLd={serviceSchema}>
+  <PageHero
+    eyebrow={service.hero.eyebrow}
+    title={service.hero.title}
+    accent={service.hero.accent}
+    lead={service.hero.lead}
+    image={service.image}
+    imageAlt={service.imageAlt}
+    crumbs={[{ label: 'Hizmetlerimiz', href: '/hizmetler' }, { label: service.title }]}
+  >
+    <a href={quoteHref} class="btn btn--light">Teklif Al <Icon name="arrow-right" /></a>
+    <a href={site.contact.phoneHref} class="btn btn--ghost-light"><Icon name="phone" /> Bizi Arayın</a>
+    <nav slot="meta" class="toc" aria-label="Bu sayfada">
+      <p class="toc__label">{categories[service.category].label}</p>
+      <ol role="list">
+        {
+          toc.map((t, i) => (
+            <li>
+              <a href={`#${t.id}`}>
+                <span>0{i + 1}</span>
+                {t.label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+  </PageHero>
+
+  <!-- Overview -->
+  <section class="section overview" id="genel-bakis" aria-labelledby="overview-title">
+    <div class="container">
+      <div class="overview__grid">
+        <div class="overview__head" data-reveal>
+          <p class="eyebrow">Genel bakış</p>
+          <h2 class="h2" id="overview-title">{service.intro.heading}</h2>
+        </div>
+        <div class="overview__body prose" data-reveal style="--reveal-delay:100">
+          {service.intro.paragraphs.map((p) => <p class="overview__p">{p}</p>)}
+          {
+            service.intro.quote && (
+              <blockquote class="overview__quote">
+                <p>{service.intro.quote}</p>
+              </blockquote>
+            )
+          }
+        </div>
+      </div>
+
+      <figure class="overview__figure">
+        <div class="overview__media" data-reveal-mask>
+          <Image
+            src={service.detailImage}
+            alt={service.detailImageAlt}
+            widths={[640, 960, 1440, 2000]}
+            sizes="(min-width: 1400px) 1360px, 94vw"
+            loading="lazy"
+          />
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section class="section surface-white" id="kullanim" aria-labelledby="usecases-title">
+    <div class="container">
+      <SectionHeader
+        id="usecases-title"
+        eyebrow="Kimler · hangi durumlar"
+        title={service.useCases.heading}
+        lead={service.useCases.lead}
+        layout="split"
+      />
+      <ul class="uses" role="list">
+        {
+          service.useCases.items.map((item, i) => (
+            <li data-reveal style={`--reveal-delay:${(i % 3) * 80}`}>
+              <span class="uses__num">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="h4">{item.title}</h3>
+              <p>{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Advantages -->
+  <section class="section surface-ink advantages" id="avantajlar" aria-labelledby="adv-title">
+    <div class="container">
+      <SectionHeader id="adv-title" eyebrow="Avantajlar" title="Bu operasyonda" accent="farkı yaratan." layout="split">
+        <p class="lead">Her detay, operasyonun güvenli, zamanında ve öngörülebilir ilerlemesi için planlanır.</p>
+      </SectionHeader>
+      <ol class="adv" role="list">
+        {
+          service.advantages.map((a, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 80}`}>
+              <span class="adv__num">0{i + 1}</span>
+              <h3 class="adv__title">{a.title}</h3>
+              <p>{a.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section class="section" id="surec" aria-labelledby="process-title">
+    <div class="container">
+      <SectionHeader
+        id="process-title"
+        eyebrow="Operasyon süreci"
+        title="Adım adım,"
+        accent="şeffaf bir plan."
+        lead="Talebinizi aldığımız andan teslimata kadar her aşamada neyin, ne zaman yapılacağını bilirsiniz."
+        layout="split"
+      />
+      <ProcessSteps steps={steps} />
+    </div>
+  </section>
+
+  <!-- Capabilities -->
+  <section class="section surface-paper-2" id="kabiliyetler" aria-labelledby="cap-title">
+    <div class="container cap">
+      <div class="cap__head" data-reveal>
+        <p class="eyebrow">Operasyonel kabiliyetler</p>
+        <h2 class="h2" id="cap-title">Kapsamımızda <em>neler var?</em></h2>
+        <p class="lead">
+          Her operasyon, ihtiyaca göre aşağıdaki bileşenlerin bir araya getirilmesiyle planlanır.
+        </p>
+        <div class="btn-row">
+          <a href={quoteHref} class="btn">Teklif Al <Icon name="arrow-right" /></a>
+          <a href={withBase('/iletisim')} class="btn btn--ghost">Bizimle İletişime Geçin</a>
+        </div>
+      </div>
+      <ul class="check-list cap__list" role="list" data-reveal style="--reveal-delay:120">
+        {service.capabilities.map((c) => <li>{c}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section class="section" aria-labelledby="related-title">
+    <div class="container">
+      <SectionHeader id="related-title" eyebrow="İlgili çözümler" title="Bunlar da" accent="ilginizi çekebilir." layout="split">
+        <a href={withBase('/hizmetler')} class="link-arrow">Tüm hizmetler <Icon name="arrow-right" /></a>
+      </SectionHeader>
+      <div class="related">
+        {related.map((s, i) => <ServiceCard service={s} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow={service.navTitle}
+    title="Bu operasyonu"
+    accent="birlikte planlayalım."
+    image={service.detailImage}
+    primaryHref={quoteHref}
+  />
+</BaseLayout>
+
+<style>
+  /* Hero table of contents */
+  .toc {
+    min-width: 240px;
+    padding: 1.25rem 1.5rem;
+    background: rgba(5, 9, 15, 0.45);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line-inv);
+  }
+
+  .toc__label {
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line-inv);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-300);
+  }
+
+  .toc a {
+    display: flex;
+    gap: 0.85rem;
+    padding: 0.4rem 0;
+    font-size: var(--fs-small);
+    color: var(--text-inv-2);
+    transition: color 0.25s;
+  }
+
+  .toc a:hover {
+    color: var(--white);
+  }
+
+  .toc span {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--text-inv-3);
+  }
+
+  @media (max-width: 899px) {
+    .toc {
+      display: none;
+    }
+  }
+
+  /* Overview */
+  .overview__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2.5rem clamp(3rem, 7vw, 8rem);
+  }
+
+  .overview__head .h2 {
+    margin-top: 1.25rem;
+    max-width: 16ch;
+  }
+
+  .overview__p {
+    font-size: 1.125rem;
+    line-height: 1.75;
+  }
+
+  .overview__quote {
+    margin-top: 2.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--brand);
+  }
+
+  .overview__quote p {
+    font-family: var(--font-serif);
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.85rem);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+
+  .overview__figure {
+    margin-top: clamp(3.5rem, 3rem + 4vw, 6.5rem);
+  }
+
+  .overview__media {
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    background: var(--ink-800);
+  }
+
+  .overview__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 899px) {
+    .overview__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .overview__media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  /* Use cases */
+  .uses {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 2rem;
+  }
+
+  .uses li {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: 1.75rem 0 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .uses__num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .uses p {
+    font-size: var(--fs-small);
+    color: var(--text-2);
+    max-width: 38ch;
+  }
+
+  @media (max-width: 899px) {
+    .uses {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 559px) {
+    .uses {
+      grid-template-columns: 1fr;
+    }
+
+    .uses li {
+      padding-bottom: 1.75rem;
+    }
+  }
+
+  /* Advantages */
+  .adv {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--line-inv-strong);
+  }
+
+  .adv li {
+    display: grid;
+    align-content: start;
+    gap: 0.85rem;
+    padding: 2rem 1.75rem 0.5rem;
+    border-left: 1px solid var(--line-inv);
+  }
+
+  .adv li:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .adv__num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand-300);
+  }
+
+  .adv__title {
+    font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.7rem);
+    line-height: 1.15;
+  }
+
+  .adv p {
+    font-size: var(--fs-small);
+    color: var(--text-inv-2);
+  }
+
+  @media (max-width: 1023px) {
+    .adv {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .adv li {
+      padding: 1.75rem 1.25rem 1.75rem;
+    }
+
+    .adv li:nth-child(odd) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .adv li:nth-child(n + 3) {
+      border-top: 1px solid var(--line-inv);
+    }
+  }
+
+  @media (max-width: 559px) {
+    .adv {
+      grid-template-columns: 1fr;
+    }
+
+    .adv li {
+      padding: 1.5rem 0;
+      border-left: 0;
+    }
+
+    .adv li + li {
+      border-top: 1px solid var(--line-inv);
+    }
+  }
+
+  /* Capabilities */
+  .cap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 3rem clamp(3rem, 7vw, 8rem);
+    align-items: start;
+  }
+
+  .cap__head {
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+  }
+
+  .cap__head .h2 em {
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  .cap__list li {
+    font-size: 1.0625rem;
+    color: var(--text);
+  }
+
+  @media (max-width: 899px) {
+    .cap {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Related */
+  .related {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  @media (max-width: 899px) {
+    .related {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+</style>

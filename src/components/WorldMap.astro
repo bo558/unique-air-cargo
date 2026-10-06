@@ -1,0 +1,201 @@
+---
+/**
+ * Dot-matrix world map (Natural Earth projection, generated from Natural Earth 110m land data
+ * by scripts/generate-assets.mjs) with arcs from the Istanbul hub to the regions where the
+ * company states it has local representation.
+ */
+import map from '@/data/world-map.json';
+
+type Pt = [number, number];
+const { width, dots, points } = map as unknown as {
+  width: number;
+  height: number;
+  dots: Pt[];
+  points: Record<string, Pt>;
+};
+
+const hub = points.istanbul;
+
+// Crop the viewBox to the land actually drawn (no empty band where Antarctica was skipped).
+const ys = dots.map(([, y]) => y);
+const top = Math.floor(Math.min(...ys) - 14);
+const viewH = Math.ceil(Math.max(...ys) + 14) - top;
+
+const regions: { key: string; label: string; at: Pt; anchor: 'start' | 'end' | 'middle'; dx: number; dy: number }[] = [
+  { key: 'europe', label: 'Avrupa', at: points.europe, anchor: 'end', dx: -10, dy: 18 },
+  { key: 'russia', label: 'Rusya', at: points.russia, anchor: 'start', dx: 10, dy: -10 },
+  { key: 'cis', label: 'BDT', at: points.cis, anchor: 'start', dx: 12, dy: 4 },
+  { key: 'middleEast', label: 'Orta Doğu', at: points.middleEast, anchor: 'start', dx: 12, dy: 10 },
+  { key: 'africa', label: 'Afrika', at: [(points.africa[0] + points.africaE[0]) / 2, points.africa[1] + 8], anchor: 'start', dx: 12, dy: 4 },
+  { key: 'farEast', label: 'Uzak Doğu', at: points.farEast, anchor: 'start', dx: 12, dy: 4 },
+  { key: 'usa', label: 'ABD', at: points.usa, anchor: 'end', dx: -12, dy: 4 },
+];
+
+const arc = (from: Pt, to: Pt) => {
+  const [x1, y1] = from;
+  const [x2, y2] = to;
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  const lift = Math.min(dist * 0.32, 140);
+  return `M${x1} ${y1} Q${mx} ${my - lift} ${x2} ${y2}`;
+};
+
+// One path for all land dots keeps the SVG light (a zero-length segment + round cap = dot).
+const dotPath = dots.map(([x, y]) => `M${x} ${y}h0`).join('');
+---
+
+<figure class="wm" data-reveal="fade">
+  <svg viewBox={`0 ${top} ${width} ${viewH}`} role="img" aria-labelledby="wm-title wm-desc" preserveAspectRatio="xMidYMid meet">
+    <title id="wm-title">Unique Air Cargo global temsil ağı</title>
+    <desc id="wm-desc">
+      İstanbul merkezinden Avrupa, Rusya, BDT ülkeleri, Orta Doğu, Afrika, Uzak Doğu ve ABD'deki yerel temsilcilere uzanan
+      bağlantılar.
+    </desc>
+    <path d={dotPath} class="wm__land" />
+    <g class="wm__arcs">
+      {regions.map((r, i) => <path d={arc(hub, r.at)} pathLength="1" style={`--i:${i}`} />)}
+    </g>
+    <g class="wm__nodes">
+      {
+        regions.map((r, i) => (
+          <g style={`--i:${i}`} class="wm__node">
+            <circle cx={r.at[0]} cy={r.at[1]} r="3.2" />
+            <text x={r.at[0] + r.dx} y={r.at[1] + r.dy} text-anchor={r.anchor}>
+              {r.label}
+            </text>
+          </g>
+        ))
+      }
+    </g>
+    <g class="wm__hub">
+      <circle cx={hub[0]} cy={hub[1]} r="14" class="wm__pulse" />
+      <circle cx={hub[0]} cy={hub[1]} r="5" class="wm__core" />
+      <text x={hub[0] + 2} y={hub[1] + 26} text-anchor="middle">İSTANBUL</text>
+    </g>
+  </svg>
+</figure>
+
+<style>
+  .wm {
+    position: relative;
+    width: 100%;
+  }
+
+  .wm svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .wm__land {
+    stroke: rgba(182, 216, 230, 0.34);
+    stroke-width: 4;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  .wm__arcs path {
+    fill: none;
+    stroke: var(--brand-300);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0.9;
+  }
+
+  .wm__node circle {
+    fill: var(--ink-900);
+    stroke: var(--brand-200);
+    stroke-width: 1.5;
+  }
+
+  .wm__node text,
+  .wm__hub text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    fill: var(--text-inv-2);
+  }
+
+  .wm__hub text {
+    fill: var(--white);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+  }
+
+  .wm__core {
+    fill: var(--white);
+  }
+
+  .wm__pulse {
+    fill: none;
+    stroke: var(--brand-300);
+    stroke-width: 1;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .wm__node {
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out);
+    transition-delay: calc(0.9s + var(--i) * 0.12s);
+  }
+
+  .wm.is-visible .wm__arcs path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.6s var(--ease-in-out);
+    transition-delay: calc(0.2s + var(--i) * 0.12s);
+  }
+
+  .wm.is-visible .wm__node {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .wm.is-visible .wm__pulse {
+      animation: wm-pulse 2.8s var(--ease-out) infinite;
+    }
+  }
+
+  @keyframes wm-pulse {
+    from {
+      transform: scale(0.4);
+      opacity: 1;
+    }
+    to {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+
+  /* Without JS the reveal class never lands — keep everything visible. */
+  :global(html:not(.js)) .wm__arcs path {
+    stroke-dashoffset: 0;
+  }
+
+  :global(html:not(.js)) .wm__node {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wm__arcs path {
+      stroke-dashoffset: 0;
+    }
+    .wm__node {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .wm__node text,
+    .wm__hub text {
+      font-size: 17px;
+    }
+
+    .wm__land {
+      stroke-width: 5;
+    }
+  }
+</style>

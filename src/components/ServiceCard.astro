@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { categories, serviceHref, type Service } from '@/data/services';
+
+interface Props {
+  service: Service;
+  index?: number;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { service, index, headingLevel: Heading = 'h3' } = Astro.props;
+---
+
+<article class="card" data-reveal style={index !== undefined ? `--reveal-delay:${(index % 3) * 80}` : undefined}>
+  <a href={serviceHref(service.slug)} class="card__link">
+    <div class="card__media media media--zoom">
+      <Image
+        src={service.image}
+        alt={service.imageAlt}
+        widths={[480, 720, 960]}
+        sizes="(min-width: 1100px) 420px, (min-width: 700px) 45vw, 92vw"
+        loading="lazy"
+      />
+    </div>
+    <div class="card__body">
+      <p class="card__cat">{categories[service.category].label}</p>
+      <Heading class="card__title">{service.title}</Heading>
+      <p class="card__text">{service.summary}</p>
+      <span class="card__more">
+        Detaylı bilgi <Icon name="arrow-right" size={16} />
+      </span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .card__link {
+    display: grid;
+    height: 100%;
+    grid-template-rows: auto 1fr;
+  }
+
+  .card__media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .card__body {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 0.6rem;
+    padding: 1.5rem 0 0;
+  }
+
+  .card__cat {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brand-600);
+  }
+
+  .card__title {
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    transition: color 0.3s;
+  }
+
+  .card__text {
+    font-size: var(--fs-small);
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .card__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+    transition: color 0.3s;
+  }
+
+  .card__more :global(svg) {
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .card__link:hover .card__title,
+  .card__link:hover .card__more {
+    color: var(--brand-600);
+  }
+
+  .card__link:hover .card__more :global(svg) {
+    transform: translateX(4px);
+  }
+
+  .card__link:hover :global(img) {
+    transform: scale(1.04);
+  }
+</style>

@@ -1,0 +1,208 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Breadcrumbs, { type Crumb } from './Breadcrumbs.astro';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  accent?: string;
+  lead?: string;
+  image: ImageMetadata;
+  imageAlt: string;
+  /** CSS object-position for the photo */
+  position?: string;
+  crumbs?: Crumb[];
+  size?: 'tall' | 'default' | 'compact';
+}
+
+const { eyebrow, title, accent, lead, image, imageAlt, position = 'center', crumbs, size = 'default' } = Astro.props;
+---
+
+<section class:list={['page-hero', 'on-dark', `page-hero--${size}`]} aria-labelledby="page-title">
+  <div class="page-hero__media" aria-hidden={imageAlt ? undefined : 'true'}>
+    <Picture
+      src={image}
+      alt={imageAlt}
+      formats={['avif', 'webp']}
+      widths={[640, 960, 1440, 1920, 2400]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      style={`object-position:${position}`}
+    />
+  </div>
+  <div class="page-hero__scrim" aria-hidden="true"></div>
+
+  <div class="container page-hero__inner">
+    {crumbs && <div class="page-hero__crumbs"><Breadcrumbs items={crumbs} /></div>}
+
+    <div class="page-hero__content">
+      {eyebrow && <p class="eyebrow page-hero__eyebrow">{eyebrow}</p>}
+      <h1 id="page-title" class="page-hero__title">
+        {title}
+        {accent && (
+          <>
+            {' '}
+            <em class="page-hero__accent">{accent}</em>
+          </>
+        )}
+      </h1>
+      {lead && <p class="page-hero__lead">{lead}</p>}
+      {Astro.slots.has('default') && <div class="page-hero__actions"><slot /></div>}
+    </div>
+
+    {Astro.slots.has('meta') && <div class="page-hero__meta"><slot name="meta" /></div>}
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    display: flex;
+    min-height: clamp(560px, 82vh, 860px);
+    background: var(--ink-950);
+    color: var(--text-inv);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .page-hero--tall {
+    min-height: clamp(620px, 100svh, 980px);
+  }
+
+  .page-hero--compact {
+    min-height: clamp(420px, 56vh, 560px);
+  }
+
+  .page-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .page-hero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .page-hero__media :global(img) {
+      animation: hero-settle 2.6s var(--ease-out) both;
+    }
+  }
+
+  @keyframes hero-settle {
+    from {
+      transform: scale(1.08);
+      opacity: 0.4;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .page-hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to top, rgba(5, 9, 15, 0.92) 0%, rgba(5, 9, 15, 0.35) 45%, rgba(5, 9, 15, 0.1) 70%, rgba(5, 9, 15, 0.45) 100%),
+      linear-gradient(to right, rgba(5, 9, 15, 0.72) 0%, rgba(5, 9, 15, 0.25) 55%, rgba(5, 9, 15, 0) 100%);
+  }
+
+  .page-hero__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr;
+    align-items: end;
+    gap: 2.5rem 4rem;
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 3vw, 2.5rem));
+    padding-bottom: clamp(3rem, 2rem + 4vw, 5.5rem);
+  }
+
+  .page-hero__crumbs {
+    grid-column: 1 / -1;
+    align-self: start;
+  }
+
+  .page-hero__content {
+    max-width: 900px;
+  }
+
+  .page-hero__eyebrow {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-hero__title {
+    font-size: var(--fs-h1);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+
+  .page-hero--tall .page-hero__title {
+    font-size: var(--fs-display);
+  }
+
+  .page-hero__accent {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-200);
+  }
+
+  .page-hero__lead {
+    max-width: 58ch;
+    margin-top: 1.75rem;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--text-inv-2);
+  }
+
+  .page-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+  }
+
+  .page-hero__meta {
+    justify-self: end;
+    max-width: 320px;
+  }
+
+  @media (max-width: 899px) {
+    .page-hero__inner {
+      grid-template-columns: 1fr;
+      row-gap: clamp(9rem, 38vw, 15rem);
+      padding-top: calc(var(--header-h) + 1rem);
+    }
+
+    .page-hero--compact .page-hero__inner {
+      row-gap: clamp(6rem, 26vw, 10rem);
+    }
+
+    .page-hero__meta {
+      justify-self: start;
+      max-width: none;
+    }
+
+    .page-hero__scrim {
+      background: linear-gradient(
+        to top,
+        rgba(5, 9, 15, 0.96) 0%,
+        rgba(5, 9, 15, 0.82) 45%,
+        rgba(5, 9, 15, 0.2) 75%,
+        rgba(5, 9, 15, 0.6) 100%
+      );
+    }
+  }
+
+  @media (max-width: 479px) {
+    .page-hero__actions > :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+</style>

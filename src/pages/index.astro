@@ -1,0 +1,754 @@
+---
+import { withBase } from '@/utils/paths';
+import { Picture, Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ServiceIndex from '@/components/ServiceIndex.astro';
+import WorldMap from '@/components/WorldMap.astro';
+import ScenarioTabs from '@/components/ScenarioTabs.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+
+import heroImage from '@/assets/images/hero-freighter-night.jpg';
+import whyImage from '@/assets/images/marshaller.jpg';
+import ctaImage from '@/assets/images/night-approach.jpg';
+
+const principles = [
+  { title: 'İhtiyacı tam anlamak', text: 'Her talep; yükün, rotanın ve zamanın birlikte değerlendirilmesiyle başlar.' },
+  { title: 'Ekonomik çözüm', text: 'Uygun uçak seçenekleri karşılaştırılır, piyasa koşullarına uygun teklif sunulur.' },
+  { title: 'En hızlı yanıt', text: 'Amacımız her kiralama talebini en kısa sürede çözüme kavuşturmaktır.' },
+  { title: 'Önce emniyet', text: 'ICAO ve IATA kurallarına uygun, uçuş emniyetini önceleyen operasyon.' },
+];
+
+const reasons = [
+  {
+    title: 'Tek muhatap',
+    text: 'Teklif aşamasından teslimata kadar operasyonunuzu aynı ekip yönetir. Bilgi kaybolmaz, karar süreleri kısalır.',
+  },
+  {
+    title: 'Doğru uçak, doğru fiyat',
+    text: 'Talebinize uygun uçak seçeneklerini değerlendirir; ihtiyacınız kadar kapasiteyi piyasa koşullarına uygun fiyatla sunarız.',
+  },
+  {
+    title: 'Kurallara hâkimiyet',
+    text: 'Tehlikeli madde, diplomatik izin ve özel elleçleme gerektiren süreçleri ICAO ve IATA kurallarına uygun yürütürüz.',
+  },
+  {
+    title: 'Hız, ama özenle',
+    text: 'Her talebe hızla yanıt veririz; ancak hızın emniyetin önüne geçmesine izin vermeyiz.',
+  },
+];
+
+const assurances = [
+  { label: 'Standart', text: 'ICAO ve IATA kurallarına uygun charter operasyonları' },
+  { label: 'Tehlikeli madde', text: 'IATA Tehlikeli Madde Regülasyonları konusunda eğitimli ekip' },
+  { label: 'İzinler', text: 'Diplomatik ve özel izin gerektiren sevkiyatlarda koordinasyon' },
+  { label: 'Medikal', text: 'Her ambulans uçuşunda en az bir doktor ve yetkili hemşire' },
+  { label: 'Merkez', text: 'İstanbul — Asya ile Avrupa’nın kesişim noktası' },
+];
+---
+
+<BaseLayout
+  description="Unique Air Cargo; İstanbul merkezli charter uçak kiralama şirketi. Kargo, ağır ve büyük hacimli yük, tehlikeli madde, acil sevkiyat, VIP jet, grup ve ambulans uçuşları için 7 bölgede yerel temsilci ağıyla global çözümler."
+>
+  <!-- ============================================================ HERO -->
+  <section class="hero on-dark" aria-labelledby="hero-title">
+    <div class="hero__media">
+      <Picture
+        src={heroImage}
+        alt="Gece apronda yükleme yapılan geniş gövdeli kargo uçağı"
+        formats={['avif', 'webp']}
+        widths={[640, 960, 1280, 1600, 2000]}
+        sizes="(min-width: 1024px) 58vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+    <div class="hero__scrim" aria-hidden="true"></div>
+
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <p class="eyebrow hero__eyebrow" data-reveal>Kargo & yolcu charter · İstanbul</p>
+        <h1 class="hero__title display" id="hero-title" data-reveal style="--reveal-delay:80">
+          Gökyüzünde doğru uçak,
+          <em>yerde doğru ekip.</em>
+        </h1>
+        <p class="hero__lead" data-reveal style="--reveal-delay:160">
+          Ağır ve büyük hacimli yükten tehlikeli maddeye, VIP uçuştan ambulans uçağa kadar her charter talebini
+          İstanbul’dan planlıyor, global temsilci ağımızla operasyona dönüştürüyoruz.
+        </p>
+        <div class="btn-row hero__actions" data-reveal style="--reveal-delay:240">
+          <a href={withBase('/iletisim#teklif')} class="btn btn--light">Teklif Al <Icon name="arrow-right" /></a>
+          <a href="#hizmetler" class="btn btn--ghost-light">Hizmetleri Keşfedin</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__bar">
+      <div class="container">
+        <dl class="hero__facts" data-reveal="fade" style="--reveal-delay:400">
+          <div>
+            <dt>Erişim</dt>
+            <dd>7 bölgede yerel temsilci</dd>
+          </div>
+          <div>
+            <dt>Standart</dt>
+            <dd>ICAO & IATA kurallarına uygun</dd>
+          </div>
+          <div>
+            <dt>Kapsam</dt>
+            <dd>Kargo, yolcu ve medikal charter</dd>
+          </div>
+          <div class="hero__call">
+            <dt>Charter hattı</dt>
+            <dd><a href={site.contact.phoneHref}>{site.contact.phone}</a></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ VALUE PROPOSITION -->
+  <section class="section intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid">
+        <p class="eyebrow" data-reveal>Biz kimiz</p>
+        <div>
+          <h2 class="intro__statement" id="intro-title" data-reveal>
+            Tarifeli uçuşların yetmediği yerde başlıyoruz. <span>Yükün ölçüsü, rotanın zorluğu ya da zamanın darlığı fark
+            etmez; doğru uçağı bulur, operasyonu uçtan uca yönetiriz.</span>
+          </h2>
+          <div class="intro__body" data-reveal>
+            <p>
+              Unique Air Cargo, merkezi İstanbul’da bulunan ve havacılık sektöründe uzun yıllar çalışmış deneyimli
+              kadrosuyla uçak kiralama alanında faaliyet gösteren bir havacılık şirketidir. Temel işimiz;
+              müşterilerimizin ihtiyaçlarını tam olarak anlamak, bu ihtiyaçları ekonomik biçimde çözmek ve dünya
+              genelindeki kargo şirketlerinin stratejik taşımacılık ihtiyaçlarına destek olmaktır.
+            </p>
+            <a href={withBase('/kurumsal')} class="link-arrow">Kurumsal <Icon name="arrow-right" /></a>
+          </div>
+        </div>
+      </div>
+
+      <ol class="principles" role="list">
+        {
+          principles.map((p, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 80}`}>
+              <span class="principles__num">0{i + 1}</span>
+              <h3 class="h4">{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================================================ SERVICES -->
+  <section class="section section--flush-top" id="hizmetler" aria-labelledby="services-title">
+    <div class="container">
+      <SectionHeader
+        id="services-title"
+        eyebrow="Hizmetlerimiz"
+        title="Her yük, her yolcu,"
+        accent="her rota için."
+        lead="Kargo, yolcu ve özel operasyonlar için on bir uzmanlık alanında charter çözümleri. Her biri, yükün ya da yolculuğun kendine özgü gerekliliklerine göre planlanır."
+        layout="split"
+      >
+        <a href={withBase('/hizmetler')} class="link-arrow">Tüm hizmetler <Icon name="arrow-right" /></a>
+      </SectionHeader>
+      <ServiceIndex />
+    </div>
+  </section>
+
+  <!-- ============================================================ GLOBAL REACH -->
+  <section class="section surface-ink global" aria-labelledby="global-title">
+    <div class="container">
+      <div class="global__head">
+        <div data-reveal>
+          <p class="eyebrow">Global erişim</p>
+          <h2 class="h2 global__title" id="global-title">İstanbul’dan <em>yedi bölgeye.</em></h2>
+        </div>
+        <div class="global__text" data-reveal style="--reveal-delay:100">
+          <p class="lead">
+            Asya ile Avrupa’yı birleştiren İstanbul’daki merkezimiz; Avrupa, BDT ülkeleri, Rusya, Afrika, Orta Doğu,
+            Uzak Doğu ve ABD’deki yerel temsilcilerimizle birlikte çalışır.
+          </p>
+          <p>
+            Böylece taleplerinize, uçuşun gerçekleşeceği bölgenin kurallarını, havalimanlarını ve koşullarını bilen bir
+            ağla yanıt veririz.
+          </p>
+        </div>
+      </div>
+
+      <WorldMap />
+
+      <dl class="global__stats">
+        <div data-reveal>
+          <dt>Kıta</dt>
+          <dd>7</dd>
+          <p>Yedi kıtada charter çözümleri</p>
+        </div>
+        <div data-reveal style="--reveal-delay:80">
+          <dt>Temsil</dt>
+          <dd>7</dd>
+          <p>Bölgede yerel temsilci</p>
+        </div>
+        <div data-reveal style="--reveal-delay:160">
+          <dt>Uzmanlık</dt>
+          <dd>11</dd>
+          <p>Charter hizmet alanı</p>
+        </div>
+        <div data-reveal style="--reveal-delay:240">
+          <dt>Merkez</dt>
+          <dd>IST</dd>
+          <p>Asya ile Avrupa’nın kesişiminde</p>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============================================================ WHY -->
+  <section class="section why" aria-labelledby="why-title">
+    <div class="container why__grid">
+      <div class="why__media" data-reveal-mask>
+        <Image
+          src={whyImage}
+          alt="Apronda uçağı park pozisyonuna yönlendiren yer hizmetleri personeli"
+          widths={[480, 720, 960, 1200]}
+          sizes="(min-width: 1024px) 42vw, 92vw"
+          loading="lazy"
+        />
+      </div>
+      <div class="why__content">
+        <SectionHeader
+          id="why-title"
+          eyebrow="Neden biz"
+          title="Kritik operasyonlar,"
+          accent="emin ellerde."
+        />
+        <ol class="why__list" role="list">
+          {
+            reasons.map((r, i) => (
+              <li data-reveal style={`--reveal-delay:${i * 80}`}>
+                <span class="why__num">0{i + 1}</span>
+                <div>
+                  <h3 class="h4">{r.title}</h3>
+                  <p>{r.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ SCENARIOS -->
+  <section class="section surface-white" aria-labelledby="scenarios-title">
+    <div class="container">
+      <SectionHeader
+        id="scenarios-title"
+        eyebrow="Operasyon senaryoları"
+        title="Gerçek ihtiyaçlar,"
+        accent="kurgulanmış çözümler."
+        lead="Aşağıdaki temsili senaryolar, charter taşımacılığın hangi durumlarda devreye girdiğini ve bir operasyonun adım adım nasıl kurgulandığını gösterir."
+        layout="split"
+      />
+      <ScenarioTabs />
+    </div>
+  </section>
+
+  <!-- ============================================================ TRUST -->
+  <section class="section trust" aria-labelledby="trust-title">
+    <div class="container trust__grid">
+      <div class="trust__motto" data-reveal>
+        <p class="eyebrow">Kurumsal güvence</p>
+        <h2 class="trust__title" id="trust-title">Above All, <em>We Care.</em></h2>
+        <p class="lead">
+          Sloganımız bir söz değil, çalışma biçimimiz: Her operasyonda önce emniyet, sonra hız; her talepte önce
+          ihtiyacı anlamak, sonra çözüm üretmek.
+        </p>
+      </div>
+      <dl class="trust__list">
+        {
+          assurances.map((a, i) => (
+            <div data-reveal style={`--reveal-delay:${i * 70}`}>
+              <dt>{a.label}</dt>
+              <dd>{a.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <CtaBand image={ctaImage} />
+</BaseLayout>
+
+<style>
+  /* ---------------------------------------------------------------- Hero */
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: clamp(640px, 100svh, 1000px);
+    background: var(--ink-950);
+    color: var(--text-inv);
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .hero__media {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 58%;
+    z-index: -2;
+  }
+
+  .hero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 60%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__media :global(img) {
+      animation: hero-in 2.8s var(--ease-out) both;
+    }
+  }
+
+  @keyframes hero-in {
+    from {
+      transform: scale(1.1);
+      opacity: 0.3;
+    }
+  }
+
+  .hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to right, var(--ink-950) 38%, rgba(5, 9, 15, 0.75) 50%, rgba(5, 9, 15, 0.1) 72%, rgba(5, 9, 15, 0) 100%),
+      linear-gradient(to top, rgba(5, 9, 15, 0.85) 0%, rgba(5, 9, 15, 0) 30%);
+  }
+
+  .hero__inner {
+    display: flex;
+    align-items: center;
+    padding-top: calc(var(--header-h) + 3rem);
+    padding-bottom: 3rem;
+  }
+
+  .hero__content {
+    max-width: 680px;
+  }
+
+  .hero__eyebrow {
+    margin-bottom: 2rem;
+  }
+
+  .hero__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-200);
+  }
+
+  .hero__lead {
+    max-width: 50ch;
+    margin-top: 2rem;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--text-inv-2);
+  }
+
+  .hero__actions {
+    margin-top: 2.75rem;
+  }
+
+  .hero__bar {
+    border-top: 1px solid var(--line-inv);
+    background: linear-gradient(to right, rgba(5, 9, 15, 0.9), rgba(5, 9, 15, 0.4));
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .hero__facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .hero__facts > div {
+    padding: 1.5rem 1.5rem 1.6rem;
+    border-left: 1px solid var(--line-inv);
+  }
+
+  .hero__facts > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .hero__facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-300);
+  }
+
+  .hero__facts dd {
+    margin-top: 0.4rem;
+    font-size: 0.975rem;
+    color: var(--text-inv);
+  }
+
+  .hero__call dd a {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.25s;
+  }
+
+  .hero__call dd a:hover {
+    color: var(--brand-300);
+  }
+
+  @media (max-width: 1023px) {
+    .hero__media {
+      width: 100%;
+    }
+
+    .hero__scrim {
+      background:
+        linear-gradient(to top, var(--ink-950) 6%, rgba(5, 9, 15, 0.85) 38%, rgba(5, 9, 15, 0.2) 68%, rgba(5, 9, 15, 0.5) 100%);
+    }
+
+    .hero__inner {
+      align-items: flex-end;
+      padding-top: calc(var(--header-h) + 8rem);
+    }
+
+    .hero__facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hero__facts > div {
+      padding: 1.1rem 1rem 1.2rem;
+      border-top: 1px solid var(--line-inv);
+    }
+
+    .hero__facts > div:nth-child(-n + 2) {
+      border-top: 0;
+    }
+
+    .hero__facts > div:nth-child(odd) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .hero__facts dd {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* ---------------------------------------------------------------- Intro */
+  .intro__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    gap: 2rem 4rem;
+  }
+
+  .intro__grid > .eyebrow {
+    align-self: start;
+    padding-top: 0.9rem;
+  }
+
+  .intro__statement {
+    font-size: clamp(1.75rem, 1.25rem + 2vw, 3.1rem);
+    line-height: 1.16;
+    letter-spacing: -0.022em;
+    max-width: 30ch;
+  }
+
+  .intro__statement span {
+    color: var(--text-3);
+  }
+
+  .intro__body {
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+    max-width: 62ch;
+    margin-top: 2.5rem;
+    color: var(--text-2);
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+    margin-top: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  .principles li {
+    display: grid;
+    align-content: start;
+    gap: 0.7rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--text);
+  }
+
+  .principles__num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .principles p {
+    font-size: var(--fs-small);
+    color: var(--text-2);
+  }
+
+  @media (max-width: 899px) {
+    .intro__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .intro__grid > .eyebrow {
+      padding-top: 0;
+    }
+
+    .principles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2.5rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .principles {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* ---------------------------------------------------------------- Global */
+  .global {
+    overflow: hidden;
+  }
+
+  .global__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem 4rem;
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+
+  .global__title {
+    margin-top: 1.25rem;
+  }
+
+  .global__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-300);
+  }
+
+  .global__text {
+    display: grid;
+    gap: 1rem;
+    color: var(--text-inv-2);
+  }
+
+  .global__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: clamp(2.5rem, 2rem + 3vw, 5rem);
+    border-top: 1px solid var(--line-inv-strong);
+  }
+
+  .global__stats > div {
+    display: grid;
+    grid-template-areas: 'dt' 'dd' 'p';
+    gap: 0.4rem;
+    padding: 1.75rem 1.5rem 0;
+    border-left: 1px solid var(--line-inv);
+  }
+
+  .global__stats > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .global__stats dt {
+    grid-area: dt;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-inv-3);
+  }
+
+  .global__stats dd {
+    grid-area: dd;
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 2rem + 2vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--white);
+  }
+
+  .global__stats p {
+    grid-area: p;
+    font-size: var(--fs-small);
+    color: var(--text-inv-2);
+  }
+
+  @media (max-width: 899px) {
+    .global__head {
+      grid-template-columns: 1fr;
+    }
+
+    .global__stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .global__stats > div {
+      padding: 1.5rem 1rem 1.5rem;
+    }
+
+    .global__stats > div:nth-child(odd) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .global__stats > div:nth-child(n + 3) {
+      border-top: 1px solid var(--line-inv);
+    }
+  }
+
+  /* ---------------------------------------------------------------- Why */
+  .why__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+    align-items: center;
+  }
+
+  .why__media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--ink-800);
+  }
+
+  .why__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 40%;
+  }
+
+  .why__list li {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .why__list li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .why__num {
+    padding-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .why__list p {
+    margin-top: 0.5rem;
+    font-size: var(--fs-small);
+    color: var(--text-2);
+    max-width: 52ch;
+  }
+
+  @media (max-width: 1023px) {
+    .why__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .why__media {
+      aspect-ratio: 16 / 11;
+    }
+  }
+
+  /* ---------------------------------------------------------------- Trust */
+  .trust__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem clamp(3rem, 7vw, 8rem);
+    align-items: start;
+  }
+
+  .trust__title {
+    margin: 1.5rem 0 1.75rem;
+    font-size: clamp(2.75rem, 1.75rem + 4vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+
+  .trust__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  .trust__list > div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 1.25rem;
+    padding: 1.35rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .trust__list > div:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .trust__list dt {
+    padding-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .trust__list dd {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 899px) {
+    .trust__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .trust__list > div {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+  }
+</style>

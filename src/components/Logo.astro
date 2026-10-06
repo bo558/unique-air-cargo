@@ -1,0 +1,63 @@
+---
+import { Image } from 'astro:assets';
+import logoColor from '@/assets/brand/logo-color.png';
+import logoWhite from '@/assets/brand/logo-white.png';
+
+interface Props {
+  /** `auto` renders both variants and lets the parent toggle them via CSS (`.logo--auto`). */
+  variant?: 'color' | 'white' | 'auto';
+  width?: number;
+  class?: string;
+  eager?: boolean;
+}
+
+const { variant = 'color', width = 168, class: className, eager = false } = Astro.props;
+const loading = eager ? 'eager' : 'lazy';
+---
+
+<span class:list={['logo', `logo--${variant}`, className]} style={`--logo-w:${width}px`}>
+  {
+    (variant === 'color' || variant === 'auto') && (
+      <Image
+        src={logoColor}
+        alt=""
+        width={width * 2}
+        class="logo__img logo__img--color"
+        loading={loading}
+        decoding="async"
+      />
+    )
+  }
+  {
+    (variant === 'white' || variant === 'auto') && (
+      <Image
+        src={logoWhite}
+        alt=""
+        width={width * 2}
+        class="logo__img logo__img--white"
+        loading={loading}
+        decoding="async"
+      />
+    )
+  }
+  <span class="visually-hidden">Unique Air Cargo</span>
+</span>
+
+<style>
+  .logo {
+    position: relative;
+    display: inline-grid;
+    width: var(--logo-w);
+  }
+
+  .logo__img {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: auto;
+    transition: opacity 0.4s var(--ease-out);
+  }
+
+  .logo--auto .logo__img--color {
+    opacity: 0;
+  }
+</style>

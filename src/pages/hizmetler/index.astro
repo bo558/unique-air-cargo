@@ -1,0 +1,164 @@
+---
+import { withBase } from '@/utils/paths';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { servicesByCategory, defaultProcess, services, serviceHref } from '@/data/services';
+import { site } from '@/data/site';
+import heroImage from '@/assets/images/uld-apron.jpg';
+
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Unique Air Cargo charter hizmetleri',
+  itemListElement: services.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: s.title,
+    url: new URL(serviceHref(s.slug), Astro.site).href,
+  })),
+};
+---
+
+<BaseLayout
+  title="Hizmetlerimiz"
+  description="Kargo, ağır ve büyük hacimli yük, tehlikeli madde, acil sevkiyat, canlı hayvan, VIP jet, yolcu ve grup, ambulans uçak, devlet ve askeri, yardım malzemesi ile eğlence ve spor sektörü için charter uçuş hizmetleri."
+  image={heroImage}
+  jsonLd={itemList}
+>
+  <PageHero
+    eyebrow="Hizmetlerimiz"
+    title="Her ihtiyaca uygun"
+    accent="charter çözümleri."
+    lead="Kargo, yolcu ve özel operasyonlar için on bir uzmanlık alanı. Hepsinin ortak noktası: ihtiyacı doğru anlamak, doğru uçağı bulmak ve operasyonu uçtan uca yönetmek."
+    image={heroImage}
+    imageAlt="Apronda uçağa yüklenmeyi bekleyen kargo konteynerleri ve yer hizmeti araçları"
+    crumbs={[{ label: 'Hizmetlerimiz' }]}
+  >
+    <a href={withBase('/iletisim#teklif')} class="btn btn--light">Teklif Al <Icon name="arrow-right" /></a>
+    <a href="#kargo" class="btn btn--ghost-light">Hizmetleri Keşfedin <Icon name="arrow-down" /></a>
+  </PageHero>
+
+  <nav class="cat-nav" aria-label="Hizmet kategorileri">
+    <div class="container cat-nav__inner">
+      {
+        servicesByCategory.map((cat, i) => (
+          <a href={`#${cat.id}`}>
+            <span>0{i + 1}</span> {cat.label}
+          </a>
+        ))
+      }
+    </div>
+  </nav>
+
+  {
+    servicesByCategory.map((cat, i) => (
+      <section class:list={['section', 'cat', i % 2 === 1 && 'surface-white']} id={cat.id} aria-labelledby={`${cat.id}-title`}>
+        <div class="container">
+          <SectionHeader
+            id={`${cat.id}-title`}
+            eyebrow={`0${i + 1} — Kategori`}
+            title={cat.label}
+            lead={cat.description}
+            layout="split"
+          />
+          <div class="cat__grid">
+            {cat.services.map((s, j) => (
+              <ServiceCard service={s} index={j} />
+            ))}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section surface-ink" aria-labelledby="process-title">
+    <div class="container">
+      <SectionHeader
+        id="process-title"
+        eyebrow="Nasıl çalışıyoruz"
+        title="Talepten teslimata,"
+        accent="tek bir süreç."
+        lead="Hangi hizmet olursa olsun, her operasyon aynı disiplinle ilerler: önce ihtiyacı anlarız, sonra planlarız, ardından uçtan uca yönetiriz."
+        layout="split"
+      />
+      <ProcessSteps steps={defaultProcess} />
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .cat-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(246, 244, 239, 0.94);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cat-nav__inner {
+    display: flex;
+    gap: 2.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cat-nav__inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cat-nav a {
+    flex: none;
+    padding: 1.15rem 0;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-2);
+    transition: color 0.25s;
+  }
+
+  .cat-nav a:hover {
+    color: var(--brand-600);
+  }
+
+  .cat-nav span {
+    margin-right: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .cat {
+    scroll-margin-top: 3.5rem;
+  }
+
+  .cat__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3.5rem 2rem;
+  }
+
+  @media (max-width: 1023px) {
+    .cat__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 639px) {
+    .cat__grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .cat-nav__inner {
+      gap: 1.75rem;
+    }
+  }
+</style>

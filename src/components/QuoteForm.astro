@@ -1,0 +1,603 @@
+---
+import { withBase } from '@/utils/paths';
+import Icon from './Icon.astro';
+import { servicesByCategory } from '@/data/services';
+import { site } from '@/data/site';
+
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+---
+
+<div class="qf" data-quote-form data-endpoint={endpoint} data-email={site.contact.email}>
+  <form class="qf__form" novalidate>
+    <fieldset class="qf__set">
+      <legend class="qf__legend"><span>01</span> Operasyon bilgileri</legend>
+
+      <div class="qf__grid">
+        <div class="field field--full">
+          <label for="qf-service">Hizmet türü <span class="req" aria-hidden="true">*</span></label>
+          <div class="select">
+            <select id="qf-service" name="hizmet" required aria-describedby="qf-service-err">
+              <option value="">Seçiniz</option>
+              {
+                servicesByCategory.map((cat) => (
+                  <optgroup label={cat.label}>
+                    {cat.services.map((s) => (
+                      <option value={s.slug}>{s.title}</option>
+                    ))}
+                  </optgroup>
+                ))
+              }
+              <option value="diger">Diğer / Emin değilim</option>
+            </select>
+            <Icon name="chevron-down" size={16} />
+          </div>
+          <p class="field__error" id="qf-service-err" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="qf-from">Kalkış noktası <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-from" name="kalkis" type="text" required autocomplete="off" placeholder="Şehir veya havalimanı" aria-describedby="qf-from-err" />
+          <p class="field__error" id="qf-from-err" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="qf-to">Varış noktası <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-to" name="varis" type="text" required autocomplete="off" placeholder="Şehir veya havalimanı" aria-describedby="qf-to-err" />
+          <p class="field__error" id="qf-to-err" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="qf-date">Planlanan tarih</label>
+          <input id="qf-date" name="tarih" type="date" />
+        </div>
+
+        <div class="field field--check-inline">
+          <label class="check">
+            <input type="checkbox" name="esnek" value="evet" />
+            <span class="check__box" aria-hidden="true"><Icon name="check" size={14} /></span>
+            <span>Tarih esnek</span>
+          </label>
+        </div>
+
+        <div class="field field--full">
+          <label for="qf-details">Yük veya yolcu detayları <span class="req" aria-hidden="true">*</span></label>
+          <textarea
+            id="qf-details"
+            name="detay"
+            rows="5"
+            required
+            minlength="10"
+            aria-describedby="qf-details-hint qf-details-err"></textarea>
+          <p class="field__hint" id="qf-details-hint">
+            Yük için ölçü, ağırlık ve türü; yolcu uçuşları için kişi sayısı ve özel talepleriniz.
+          </p>
+          <p class="field__error" id="qf-details-err" aria-live="polite"></p>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="qf__set">
+      <legend class="qf__legend"><span>02</span> İletişim bilgileri</legend>
+
+      <div class="qf__grid">
+        <div class="field">
+          <label for="qf-name">Ad soyad <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-name" name="ad" type="text" required autocomplete="name" aria-describedby="qf-name-err" />
+          <p class="field__error" id="qf-name-err" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="qf-company">Şirket / kurum</label>
+          <input id="qf-company" name="sirket" type="text" autocomplete="organization" />
+        </div>
+
+        <div class="field">
+          <label for="qf-email">E-posta <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-email" name="eposta" type="email" required autocomplete="email" inputmode="email" aria-describedby="qf-email-err" />
+          <p class="field__error" id="qf-email-err" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="qf-phone">Telefon <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-phone" name="telefon" type="tel" required autocomplete="tel" inputmode="tel" placeholder="+90" aria-describedby="qf-phone-err" />
+          <p class="field__error" id="qf-phone-err" aria-live="polite"></p>
+        </div>
+
+        <div class="field field--hp" aria-hidden="true">
+          <label for="qf-website">Web sitesi</label>
+          <input id="qf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="field field--full">
+          <label class="check">
+            <input type="checkbox" name="kvkk" value="onay" required aria-describedby="qf-kvkk-err" />
+            <span class="check__box" aria-hidden="true"><Icon name="check" size={14} /></span>
+            <span>
+              Kişisel verilerimin <a href={withBase('/kvkk')} target="_blank">KVKK Aydınlatma Metni</a> kapsamında, talebimin
+              yanıtlanması amacıyla işlenmesini kabul ediyorum. <span class="req" aria-hidden="true">*</span>
+            </span>
+          </label>
+          <p class="field__error" id="qf-kvkk-err" aria-live="polite"></p>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="qf__submit">
+      <button type="submit" class="btn qf__btn">
+        <span class="qf__btn-label">Teklif Talebini Gönder</span>
+        <Icon name="arrow-right" />
+      </button>
+      <p class="qf__note"><span class="req">*</span> Zorunlu alanlar</p>
+    </div>
+
+    <p class="qf__status" role="alert" aria-live="assertive" hidden></p>
+  </form>
+
+  <div class="qf__success" tabindex="-1" hidden>
+    <span class="qf__success-icon" aria-hidden="true"><Icon name="check" size={26} /></span>
+    <h3 class="qf__success-title">Talebiniz alındı.</h3>
+    <p class="qf__success-text" data-success-text>
+      Ekibimiz bilgilerinizi inceleyerek en kısa sürede sizinle iletişime geçecek. Acil durumlar için bizi doğrudan
+      arayabilirsiniz.
+    </p>
+    <div class="btn-row">
+      <a href={site.contact.phoneHref} class="btn btn--ink"><Icon name="phone" /> {site.contact.phone}</a>
+      <button type="button" class="btn btn--ghost" data-reset>Yeni talep oluştur</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .qf__set {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .qf__set + .qf__set {
+    margin-top: 2.75rem;
+  }
+
+  .qf__legend {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    width: 100%;
+    padding-bottom: 1rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-serif);
+    font-size: 1.45rem;
+    letter-spacing: -0.015em;
+  }
+
+  .qf__legend span {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .qf__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.4rem 1.25rem;
+  }
+
+  .field {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .field--full {
+    grid-column: 1 / -1;
+  }
+
+  .field--check-inline {
+    align-content: end;
+    padding-bottom: 0.9rem;
+  }
+
+  .field--hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .field > label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .req {
+    color: var(--brand);
+  }
+
+  .field input[type='text'],
+  .field input[type='email'],
+  .field input[type='tel'],
+  .field input[type='date'],
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--text);
+    transition:
+      border-color 0.25s,
+      box-shadow 0.25s;
+    appearance: none;
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 8.5rem;
+  }
+
+  .field ::placeholder {
+    color: #9aa0a9;
+  }
+
+  .field input:hover,
+  .field select:hover,
+  .field textarea:hover {
+    border-color: #bfb7a9;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(10, 122, 159, 0.14);
+  }
+
+  .field [aria-invalid='true'] {
+    border-color: #b42318;
+  }
+
+  .field [aria-invalid='true']:focus {
+    box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.14);
+  }
+
+  .select {
+    position: relative;
+  }
+
+  .select select {
+    padding-right: 2.75rem;
+    cursor: pointer;
+  }
+
+  .select :global(svg) {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-3);
+  }
+
+  .field__hint {
+    font-size: var(--fs-xs);
+    color: var(--text-3);
+  }
+
+  .field__error {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: #b42318;
+  }
+
+  .field__error:empty {
+    display: none;
+  }
+
+  .check {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.25rem 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    font-size: var(--fs-small);
+    font-weight: 400;
+    color: var(--text-2);
+    cursor: pointer;
+  }
+
+  .check input {
+    position: absolute;
+    opacity: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .check__box {
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.1rem;
+    border: 1px solid #b8b0a2;
+    border-radius: var(--radius);
+    background: var(--white);
+    color: transparent;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .check input:checked + .check__box {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: var(--white);
+  }
+
+  .check input:focus-visible + .check__box {
+    outline: 2px solid var(--brand-400);
+    outline-offset: 2px;
+  }
+
+  .check input[aria-invalid='true'] + .check__box {
+    border-color: #b42318;
+  }
+
+  .check a {
+    color: var(--brand-600);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .qf__submit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    margin-top: 2.25rem;
+  }
+
+  .qf__btn[disabled] {
+    opacity: 0.7;
+    cursor: progress;
+  }
+
+  .qf__note {
+    font-size: var(--fs-xs);
+    color: var(--text-3);
+  }
+
+  .qf__status {
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-left: 2px solid #b42318;
+    background: #fbefed;
+    font-size: var(--fs-small);
+    color: #7a1c13;
+  }
+
+  .qf__status a {
+    text-decoration: underline;
+  }
+
+  .qf__success {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+    padding: clamp(2rem, 4vw, 3rem);
+    border: 1px solid var(--line);
+    background: var(--white);
+    outline: none;
+  }
+
+  .qf__success-icon {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--brand-100);
+    color: var(--brand-600);
+  }
+
+  .qf__success-title {
+    font-size: var(--fs-h3);
+  }
+
+  .qf__success-text {
+    max-width: 52ch;
+    color: var(--text-2);
+  }
+
+  .qf__success .btn-row {
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 639px) {
+    .qf__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .field--check-inline {
+      padding-bottom: 0;
+    }
+
+    .qf__btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  type Rule = (el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => string;
+
+  const messages: Record<string, Rule> = {
+    hizmet: (el) => (el.value ? '' : 'Lütfen bir hizmet türü seçin.'),
+    kalkis: (el) => (el.value.trim().length >= 2 ? '' : 'Lütfen kalkış noktasını yazın.'),
+    varis: (el) => (el.value.trim().length >= 2 ? '' : 'Lütfen varış noktasını yazın.'),
+    detay: (el) =>
+      el.value.trim().length >= 10 ? '' : 'Lütfen yük veya yolcu detaylarını kısaca açıklayın (en az 10 karakter).',
+    ad: (el) => (el.value.trim().length >= 3 ? '' : 'Lütfen adınızı ve soyadınızı yazın.'),
+    eposta: (el) =>
+      !el.value.trim()
+        ? 'Lütfen e-posta adresinizi yazın.'
+        : /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim())
+          ? ''
+          : 'Lütfen geçerli bir e-posta adresi yazın.',
+    telefon: (el) => {
+      const digits = el.value.replace(/\D/g, '');
+      if (!digits) return 'Lütfen telefon numaranızı yazın.';
+      return digits.length >= 10 && digits.length <= 15 ? '' : 'Lütfen geçerli bir telefon numarası yazın.';
+    },
+    kvkk: (el) => ((el as HTMLInputElement).checked ? '' : 'Devam etmek için KVKK onayı gereklidir.'),
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-quote-form]').forEach((root) => {
+    const form = root.querySelector('form')!;
+    const success = root.querySelector<HTMLElement>('.qf__success')!;
+    const successText = root.querySelector<HTMLElement>('[data-success-text]')!;
+    const status = root.querySelector<HTMLElement>('.qf__status')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const submitLabel = submit.querySelector<HTMLElement>('.qf__btn-label')!;
+    const endpoint = root.dataset.endpoint?.trim();
+    const email = root.dataset.email!;
+    const defaultSuccess = successText.textContent;
+
+    // Preselect service from ?hizmet=slug
+    const select = form.elements.namedItem('hizmet') as HTMLSelectElement;
+    const preset = new URLSearchParams(window.location.search).get('hizmet');
+    if (preset && Array.from(select.options).some((o) => o.value === preset)) select.value = preset;
+
+    const date = form.elements.namedItem('tarih') as HTMLInputElement;
+    date.min = new Date().toISOString().slice(0, 10);
+
+    const fieldEl = (name: string) =>
+      form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+    const validate = (name: string) => {
+      const el = fieldEl(name);
+      const msg = messages[name](el);
+      const err = root.querySelector<HTMLElement>(`#${el.getAttribute('aria-describedby')?.split(' ').pop()}`);
+      el.setAttribute('aria-invalid', String(Boolean(msg)));
+      if (err) err.textContent = msg;
+      return !msg;
+    };
+
+    Object.keys(messages).forEach((name) => {
+      const el = fieldEl(name);
+      const evt = el instanceof HTMLInputElement && el.type === 'checkbox' ? 'change' : 'blur';
+      el.addEventListener(evt, () => validate(name));
+      el.addEventListener('input', () => {
+        if (el.getAttribute('aria-invalid') === 'true') validate(name);
+      });
+    });
+
+    const payload = () => {
+      const data = new FormData(form);
+      const serviceLabel = select.selectedOptions[0]?.textContent?.trim() ?? '';
+      return {
+        hizmet: serviceLabel,
+        kalkis: String(data.get('kalkis') ?? '').trim(),
+        varis: String(data.get('varis') ?? '').trim(),
+        tarih: String(data.get('tarih') ?? '') || 'Belirtilmedi',
+        esnek: data.get('esnek') ? 'Evet' : 'Hayır',
+        detay: String(data.get('detay') ?? '').trim(),
+        ad: String(data.get('ad') ?? '').trim(),
+        sirket: String(data.get('sirket') ?? '').trim() || '-',
+        eposta: String(data.get('eposta') ?? '').trim(),
+        telefon: String(data.get('telefon') ?? '').trim(),
+        kvkk: 'Onaylandı',
+        sayfa: window.location.href,
+      };
+    };
+
+    const showSuccess = (text?: string) => {
+      successText.textContent = text ?? defaultSuccess;
+      form.hidden = true;
+      success.hidden = false;
+      success.focus();
+      success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.hidden = true;
+
+      const invalid = Object.keys(messages).filter((name) => !validate(name));
+      if (invalid.length) {
+        fieldEl(invalid[0]).focus();
+        return;
+      }
+
+      // Honeypot: silently accept bots without sending anything.
+      if ((fieldEl('website') as HTMLInputElement).value) {
+        showSuccess();
+        return;
+      }
+
+      const data = payload();
+
+      if (!endpoint) {
+        const body = [
+          `Hizmet: ${data.hizmet}`,
+          `Kalkış: ${data.kalkis}`,
+          `Varış: ${data.varis}`,
+          `Tarih: ${data.tarih} (esnek: ${data.esnek})`,
+          '',
+          'Detaylar:',
+          data.detay,
+          '',
+          `Ad soyad: ${data.ad}`,
+          `Şirket: ${data.sirket}`,
+          `E-posta: ${data.eposta}`,
+          `Telefon: ${data.telefon}`,
+        ].join('\n');
+        const subject = `Teklif talebi: ${data.hizmet} — ${data.kalkis} → ${data.varis}`;
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        showSuccess(
+          'Talebiniz e-posta uygulamanızda hazırlandı. Göndermeyi tamamladığınızda ekibimiz en kısa sürede sizinle iletişime geçecek.',
+        );
+        return;
+      }
+
+      submit.disabled = true;
+      submitLabel.textContent = 'Gönderiliyor…';
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        showSuccess();
+      } catch {
+        status.innerHTML = `Talebiniz şu anda gönderilemedi. Lütfen tekrar deneyin ya da bize doğrudan <a href="mailto:${email}">${email}</a> adresinden ulaşın.`;
+        status.hidden = false;
+      } finally {
+        submit.disabled = false;
+        submitLabel.textContent = 'Teklif Talebini Gönder';
+      }
+    });
+
+    root.querySelector('[data-reset]')?.addEventListener('click', () => {
+      form.reset();
+      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+      success.hidden = true;
+      form.hidden = false;
+      select.focus();
+    });
+  });
+</script>

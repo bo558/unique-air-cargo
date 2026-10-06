@@ -1,0 +1,333 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { scenarios } from '@/data/scenarios';
+import { getService, serviceHref } from '@/data/services';
+---
+
+<div class="sc" data-tabs>
+  <div class="sc__tabs" role="tablist" aria-label="Operasyon senaryoları">
+    {
+      scenarios.map((s, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`sc-tab-${s.id}`}
+          aria-controls={`sc-panel-${s.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+          class="sc__tab"
+        >
+          <span class="sc__tab-num">{String(i + 1).padStart(2, '0')}</span>
+          <span class="sc__tab-label">{s.tab}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="sc__panels">
+    {
+      scenarios.map((s, i) => (
+        <article
+          class="sc__panel"
+          role="tabpanel"
+          id={`sc-panel-${s.id}`}
+          aria-labelledby={`sc-tab-${s.id}`}
+          tabindex="0"
+          hidden={i !== 0}
+        >
+          <div class="sc__media">
+            <Image src={s.image} alt={s.imageAlt} widths={[560, 840, 1200]} sizes="(min-width: 1024px) 40vw, 92vw" loading="lazy" />
+            <span class="sc__badge">Temsili senaryo</span>
+          </div>
+          <div class="sc__body">
+            <p class="sc__sector">{s.sector}</p>
+            <h3 class="sc__title">{s.title}</h3>
+            <dl class="sc__dl">
+              <div>
+                <dt>Durum</dt>
+                <dd>{s.situation}</dd>
+              </div>
+              <div>
+                <dt>İhtiyaç</dt>
+                <dd>{s.need}</dd>
+              </div>
+              <div>
+                <dt>Yaklaşım</dt>
+                <dd>{s.approach}</dd>
+              </div>
+            </dl>
+            <ul class="sc__links" role="list">
+              {s.services.map((slug) => {
+                const svc = getService(slug);
+                return svc ? (
+                  <li>
+                    <a href={serviceHref(slug)} class="link-arrow">
+                      {svc.navTitle} <Icon name="arrow-right" />
+                    </a>
+                  </li>
+                ) : null;
+              })}
+            </ul>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .sc {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 4.5rem);
+  }
+
+  .sc__tabs {
+    display: grid;
+    align-content: start;
+    border-top: 1px solid var(--line);
+  }
+
+  .sc__tab {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    color: var(--text-3);
+    transition: color 0.3s;
+  }
+
+  .sc__tab::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 1px;
+    background: var(--brand);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .sc__tab[aria-selected='true'] {
+    color: var(--text);
+  }
+
+  .sc__tab[aria-selected='true']::before {
+    transform: scaleX(1);
+  }
+
+  .sc__tab:hover {
+    color: var(--text);
+  }
+
+  .sc__tab-num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .sc__tab-label {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+
+  .sc__panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(1.75rem, 3vw, 3rem);
+    outline: none;
+  }
+
+  .sc__panel:not([hidden]) {
+    animation: sc-in 0.7s var(--ease-out);
+  }
+
+  @keyframes sc-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  .sc__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--ink-800);
+  }
+
+  .sc__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sc__badge {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    padding: 0.4rem 0.7rem;
+    background: rgba(5, 9, 15, 0.7);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .sc__sector {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-600);
+  }
+
+  .sc__title {
+    margin: 0.85rem 0 1.75rem;
+    font-size: var(--fs-h3);
+  }
+
+  .sc__dl > div {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 1rem;
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .sc__dl dt {
+    padding-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .sc__dl dd {
+    font-size: var(--fs-small);
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  .sc__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 1100px) {
+    .sc {
+      grid-template-columns: 1fr;
+    }
+
+    .sc__tabs {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-top: 0;
+      margin-inline: calc(var(--gutter) * -1);
+      padding-inline: var(--gutter);
+      scroll-padding-inline: var(--gutter);
+    }
+
+    .sc__tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .sc__tab {
+      flex: none;
+      gap: 0.6rem;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .sc__tab::before {
+      display: none;
+    }
+
+    .sc__tab[aria-selected='true'] {
+      background: var(--ink-900);
+      border-color: var(--ink-900);
+      color: var(--white);
+    }
+
+    .sc__tab[aria-selected='true'] .sc__tab-num {
+      color: var(--brand-300);
+    }
+
+    .sc__tab-label {
+      font-family: var(--font-sans);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .sc__panel {
+      grid-template-columns: 1fr;
+    }
+
+    .sc__media {
+      aspect-ratio: 16 / 10;
+    }
+
+    .sc__dl > div {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+
+    const select = (index: number, focus = false) => {
+      tabs.forEach((tab, i) => {
+        const on = i === index;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        panels[i].hidden = !on;
+      });
+      if (focus) tabs[index].focus();
+      tabs[index].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (e) => {
+        const keys: Record<string, number> = {
+          ArrowRight: (i + 1) % tabs.length,
+          ArrowDown: (i + 1) % tabs.length,
+          ArrowLeft: (i - 1 + tabs.length) % tabs.length,
+          ArrowUp: (i - 1 + tabs.length) % tabs.length,
+          Home: 0,
+          End: tabs.length - 1,
+        };
+        if (e.key in keys) {
+          e.preventDefault();
+          select(keys[e.key], true);
+        }
+      });
+    });
+  });
+</script>

@@ -1,0 +1,75 @@
+---
+import { withBase } from '@/utils/paths';
+
+export interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+const trail: Crumb[] = [{ label: 'Ana Sayfa', href: '/' }, ...items];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: trail.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.label,
+    ...(c.href ? { item: new URL(withBase(c.href), Astro.site).href } : {}),
+  })),
+};
+---
+
+<nav class="crumbs" aria-label="Sayfa konumu">
+  <ol role="list">
+    {
+      trail.map((c, i) =>
+        c.href && i < trail.length - 1 ? (
+          <li>
+            <a href={withBase(c.href)}>{c.label}</a>
+          </li>
+        ) : (
+          <li aria-current="page">{c.label}</li>
+        ),
+      )
+    }
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-inv-3);
+  }
+
+  .crumbs li:not(:last-child)::after {
+    content: '/';
+    margin-inline: 0.7rem;
+    opacity: 0.6;
+  }
+
+  .crumbs a {
+    color: var(--text-inv-2);
+    transition: color 0.25s;
+  }
+
+  .crumbs a:hover {
+    color: var(--white);
+  }
+
+  .crumbs [aria-current='page'] {
+    color: var(--brand-300);
+  }
+</style>

@@ -1,0 +1,212 @@
+---
+import { withBase } from '@/utils/paths';
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { site } from '@/data/site';
+import { services, serviceHref } from '@/data/services';
+
+const cargo = services.filter((s) => s.category === 'kargo');
+const other = services.filter((s) => s.category !== 'kargo');
+const year = new Date().getFullYear();
+const { address } = site.contact;
+---
+
+<footer class="site-footer surface-ink">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href={withBase('/')} aria-label="Unique Air Cargo — Ana sayfa"><Logo variant="white" width={176} /></a>
+        <p class="footer__claim">
+          İstanbul merkezli; kargo, yolcu ve özel operasyonlar için charter uçak kiralama çözümleri sunan havacılık
+          şirketi.
+        </p>
+        <p class="footer__motto">Above All, <em>We Care.</em></p>
+      </div>
+
+      <nav class="footer__nav" aria-label="Alt menü">
+        <div class="footer__col">
+          <p class="footer__heading">Kargo & Özel Yük</p>
+          <ul role="list">
+            {cargo.map((s) => <li><a href={serviceHref(s.slug)}>{s.navTitle}</a></li>)}
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__heading">Yolcu & Kurum</p>
+          <ul role="list">
+            {other.map((s) => <li><a href={serviceHref(s.slug)}>{s.navTitle}</a></li>)}
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__heading">Şirket</p>
+          <ul role="list">
+            <li><a href={withBase('/kurumsal')}>Kurumsal</a></li>
+            <li><a href={withBase('/hizmetler')}>Hizmetlerimiz</a></li>
+            <li><a href={withBase('/sektorler')}>Sektörler</a></li>
+            <li><a href={withBase('/iletisim')}>İletişim</a></li>
+            <li><a href={withBase('/iletisim#teklif')}>Teklif Al</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <address class="footer__contact">
+        <p class="footer__heading">İletişim</p>
+        <a href={site.contact.phoneHref} class="footer__big">{site.contact.phone}</a>
+        <a href={`mailto:${site.contact.email}`} class="footer__mail">{site.contact.email}</a>
+        <a href={site.contact.mapsUrl} target="_blank" rel="noopener" class="footer__addr">
+          {address.street}<br />
+          {address.postalCode} {address.district} / {address.city}
+          <Icon name="arrow-up-right" size={14} />
+        </a>
+      </address>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} {site.legalName}. Tüm hakları saklıdır.</p>
+      <ul role="list" class="footer__legal">
+        <li><a href={withBase('/kvkk')}>KVKK Aydınlatma Metni</a></li>
+        <li><span class="mono">İstanbul · TR</span></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--ink-950);
+    padding-top: clamp(4rem, 3rem + 4vw, 6.5rem);
+    font-size: var(--fs-small);
+  }
+
+  .footer__top {
+    display: grid;
+    grid-template-columns: 1.15fr 2fr 1fr;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    padding-bottom: clamp(3.5rem, 6vw, 5.5rem);
+  }
+
+  .footer__claim {
+    max-width: 30ch;
+    margin-top: 1.75rem;
+    color: var(--text-inv-2);
+    line-height: 1.6;
+  }
+
+  .footer__motto {
+    margin-top: 2rem;
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--text-inv);
+  }
+
+  .footer__motto em {
+    font-weight: 300;
+    color: var(--brand-300);
+  }
+
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .footer__heading {
+    margin-bottom: 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-inv-3);
+  }
+
+  .footer__col li + li {
+    margin-top: 0.55rem;
+  }
+
+  .footer__col a,
+  .footer__legal a {
+    color: var(--text-inv-2);
+    transition: color 0.25s;
+  }
+
+  .footer__col a:hover,
+  .footer__legal a:hover,
+  .footer__mail:hover,
+  .footer__addr:hover {
+    color: var(--white);
+  }
+
+  .footer__contact {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    font-style: normal;
+  }
+
+  .footer__big {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-inv);
+  }
+
+  .footer__mail {
+    color: var(--brand-300);
+  }
+
+  .footer__addr {
+    margin-top: 0.75rem;
+    color: var(--text-inv-2);
+    line-height: 1.6;
+  }
+
+  .footer__addr :global(svg) {
+    display: inline;
+    vertical-align: -2px;
+    margin-left: 0.25rem;
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding-block: 1.75rem 2rem;
+    border-top: 1px solid var(--line-inv);
+    font-size: var(--fs-xs);
+    color: var(--text-inv-3);
+  }
+
+  .footer__legal {
+    display: flex;
+    gap: 1.75rem;
+  }
+
+  @media (max-width: 1100px) {
+    .footer__top {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .footer__nav {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+
+  @media (max-width: 719px) {
+    .footer__top {
+      grid-template-columns: 1fr;
+    }
+
+    .footer__nav {
+      grid-row: auto;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .footer__nav .footer__col:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

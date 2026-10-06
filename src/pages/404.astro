@@ -1,0 +1,113 @@
+---
+import { withBase } from '@/utils/paths';
+import { Picture } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import { servicesByCategory, serviceHref } from '@/data/services';
+import image from '@/assets/images/contrail-ocean.jpg';
+
+const popular = servicesByCategory.flatMap((c) => c.services).slice(0, 4);
+---
+
+<BaseLayout title="Sayfa bulunamadı" description="Aradığınız sayfa bulunamadı." noindex>
+  <section class="nf" aria-labelledby="nf-title">
+    <div class="nf__media" aria-hidden="true">
+      <Picture src={image} alt="" formats={['avif', 'webp']} widths={[960, 1600, 2400]} sizes="100vw" loading="eager" />
+    </div>
+    <div class="container nf__inner">
+      <p class="nf__code">404 · Rota bulunamadı</p>
+      <h1 class="display nf__title" id="nf-title">Bu rota <em>haritada yok.</em></h1>
+      <p class="nf__lead">
+        Aradığınız sayfa taşınmış ya da kaldırılmış olabilir. Ana sayfaya dönebilir veya hizmetlerimize göz atabilirsiniz.
+      </p>
+      <div class="btn-row">
+        <a href={withBase('/')} class="btn btn--light">Ana Sayfaya Dön <Icon name="arrow-right" /></a>
+        <a href={withBase('/hizmetler')} class="btn btn--ghost-light">Hizmetleri Keşfedin</a>
+      </div>
+      <ul class="nf__links" role="list">
+        {popular.map((s) => <li><a href={serviceHref(s.slug)}>{s.navTitle}</a></li>)}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 100svh;
+    background: var(--ink-950);
+    color: var(--text-inv);
+    isolation: isolate;
+  }
+
+  .nf__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.55;
+  }
+
+  .nf__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--ink-950) 25%, rgba(5, 9, 15, 0.4) 70%, rgba(5, 9, 15, 0.2));
+  }
+
+  .nf__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nf__inner {
+    padding-block: calc(var(--header-h) + 4rem) 5rem;
+  }
+
+  .nf__code {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-300);
+  }
+
+  .nf__title {
+    margin: 1.5rem 0;
+    max-width: 14ch;
+  }
+
+  .nf__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-200);
+  }
+
+  .nf__lead {
+    max-width: 50ch;
+    margin-bottom: 2.5rem;
+    font-size: var(--fs-lead);
+    color: var(--text-inv-2);
+  }
+
+  .nf__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-inv);
+    font-size: var(--fs-small);
+  }
+
+  .nf__links a {
+    color: var(--text-inv-2);
+    transition: color 0.25s;
+  }
+
+  .nf__links a:hover {
+    color: var(--white);
+  }
+</style>

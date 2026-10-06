@@ -1,0 +1,156 @@
+---
+import type { Step } from '@/data/services';
+
+interface Props {
+  steps: Step[];
+}
+
+const { steps } = Astro.props;
+---
+
+<ol class="steps" role="list" style={`--n:${steps.length}`}>
+  {
+    steps.map((step, i) => (
+      <li class="step" data-reveal style={`--reveal-delay:${i * 90}`}>
+        <span class="step__marker" aria-hidden="true">
+          <span class="step__dot" />
+        </span>
+        <span class="step__num">Adım {String(i + 1).padStart(2, '0')}</span>
+        <h3 class="step__title">{step.title}</h3>
+        <p class="step__text">{step.text}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 2rem;
+    counter-reset: step;
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding-right: 1rem;
+  }
+
+  .step__marker {
+    position: relative;
+    display: block;
+    height: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .step__marker::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: -2rem;
+    top: 50%;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .step:last-child .step__marker::before {
+    right: 0;
+    background: linear-gradient(to right, var(--line), transparent);
+  }
+
+  .step__dot {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid var(--brand);
+    border-radius: 50%;
+    background: var(--paper);
+    transform: translateY(-50%);
+  }
+
+  :global(.surface-ink) .step__marker::before {
+    background: var(--line-inv-strong);
+  }
+
+  :global(.surface-ink) .step__dot {
+    background: var(--ink-900);
+    border-color: var(--brand-300);
+  }
+
+  :global(.surface-white) .step__dot {
+    background: var(--white);
+  }
+
+  :global(.surface-paper-2) .step__dot {
+    background: var(--paper-2);
+  }
+
+  .step__num {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-600);
+  }
+
+  :global(.surface-ink) .step__num {
+    color: var(--brand-300);
+  }
+
+  .step__title {
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+  }
+
+  .step__text {
+    font-size: var(--fs-small);
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  :global(.surface-ink) .step__text {
+    color: var(--text-inv-2);
+  }
+
+  @media (max-width: 1023px) {
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .step {
+      grid-template-columns: 2rem 1fr;
+      column-gap: 1.25rem;
+      padding: 0 0 2rem;
+    }
+
+    .step__marker {
+      grid-row: 1 / span 3;
+      height: auto;
+      margin: 0;
+    }
+
+    .step__marker::before {
+      left: 5px;
+      right: auto;
+      top: 0.4rem;
+      bottom: -2.4rem;
+      width: 1px;
+      height: auto;
+    }
+
+    .step:last-child .step__marker::before {
+      display: none;
+    }
+
+    .step__dot {
+      top: 0.4rem;
+      transform: none;
+    }
+  }
+</style>
