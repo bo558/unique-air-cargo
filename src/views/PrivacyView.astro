@@ -2,27 +2,118 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/PageHero.astro';
 import { site } from '@/data/site';
+import type { Locale } from '@/i18n/config';
 import heroImage from '@/assets/images/wing-clouds.jpg';
 
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
 const { address } = site.contact;
 const fullAddress = `${address.street}, ${address.postalCode} ${address.district} / ${address.city}`;
+
+const copy = {
+  en: {
+    title: 'Privacy Notice',
+    description:
+      'How Unique Air Cargo processes personal data under the Turkish Personal Data Protection Law No. 6698 (KVKK).',
+    eyebrow: 'Legal information',
+  },
+  tr: {
+    title: 'KVKK Aydınlatma Metni',
+    description: 'Unique Air Cargo kişisel verilerin korunması ve işlenmesine ilişkin 6698 sayılı KVKK kapsamında aydınlatma metni.',
+    eyebrow: 'Yasal bilgilendirme',
+  },
+}[locale];
 ---
 
-<BaseLayout
-  title="KVKK Aydınlatma Metni"
-  description="Unique Air Cargo kişisel verilerin korunması ve işlenmesine ilişkin 6698 sayılı KVKK kapsamında aydınlatma metni."
->
+<BaseLayout title={copy.title} description={copy.description}>
   <PageHero
-    eyebrow="Yasal bilgilendirme"
-    title="KVKK Aydınlatma Metni"
+    eyebrow={copy.eyebrow}
+    title={copy.title}
     image={heroImage}
     imageAlt=""
-    crumbs={[{ label: 'KVKK Aydınlatma Metni' }]}
+    crumbs={[{ label: copy.title }]}
     size="compact"
   />
 
   <section class="section">
     <div class="container container--narrow">
+      {
+        locale === 'en' && (
+          <article class="legal prose">
+            <p class="legal__intro">
+              As data controller under the Turkish Personal Data Protection Law No. 6698 (“KVKK”), {site.legalName} (“the
+              Company”) would like to inform you about the purposes for which your personal data is processed, to whom it
+              may be transferred, how it is collected, the legal basis for processing and your rights.
+            </p>
+
+            <h2>1. Data controller</h2>
+            <p>
+              <strong>{site.legalName}</strong>
+              <br />
+              {fullAddress}, Türkiye
+              <br />
+              Email: <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+            </p>
+
+            <h2>2. Personal data we process</h2>
+            <p>
+              We process the information you share with us through the quote and contact forms on this website, by email
+              or by phone: your full name, company or organisation, email address, phone number and the operational
+              details of your request (origin and destination, dates, cargo or passenger details).
+            </p>
+
+            <h2>3. Purposes of processing</h2>
+            <ul>
+              <li>Assessing and responding to your quote and information requests;</li>
+              <li>Planning charter services and carrying out contractual processes;</li>
+              <li>Coordinating operations with the relevant parties;</li>
+              <li>Fulfilling legal obligations and providing information to competent authorities.</li>
+            </ul>
+
+            <h2>4. Legal basis and method of collection</h2>
+            <p>
+              Your personal data is collected electronically through the forms on our website, by email and by phone. It
+              is processed on the legal grounds set out in Article 5 of the KVKK: processing being directly related to the
+              conclusion or performance of a contract, compliance with the Company’s legal obligations, and the Company’s
+              legitimate interests, provided this does not harm your fundamental rights and freedoms.
+            </p>
+
+            <h2>5. Transfers</h2>
+            <p>
+              Your personal data may be shared, only to the extent your request requires, with air carriers, ground
+              handling providers, our business partners in Türkiye and abroad, and competent public authorities, within
+              the conditions set out in Articles 8 and 9 of the KVKK. Given the international nature of charter
+              operations, data may be transferred abroad.
+            </p>
+
+            <h2>6. Your rights</h2>
+            <p>Under Article 11 of the KVKK, as a data subject you have the right to:</p>
+            <ul>
+              <li>learn whether your personal data is processed;</li>
+              <li>request information if it has been processed;</li>
+              <li>learn the purpose of processing and whether it is used accordingly;</li>
+              <li>know the third parties in Türkiye or abroad to whom it is transferred;</li>
+              <li>request correction if it is incomplete or inaccurate;</li>
+              <li>request deletion or destruction under the conditions set out in the KVKK;</li>
+              <li>request that third parties to whom data was transferred be notified of such correction, deletion or destruction;</li>
+              <li>object to any adverse outcome arising exclusively from automated analysis of your data;</li>
+              <li>claim compensation for damages arising from unlawful processing.</li>
+            </ul>
+
+            <h2>7. How to apply</h2>
+            <p>
+              You can submit requests regarding your rights, together with information verifying your identity, by email
+              to <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a> or in writing to {fullAddress},
+              Türkiye. Requests will be concluded within thirty days at the latest, depending on their nature.
+            </p>
+          </article>
+        )
+      }
+      {
+        locale === 'tr' && (
       <article class="legal prose">
         <p class="legal__intro">
           {site.legalName} (“Şirket”) olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca veri
@@ -92,6 +183,8 @@ const fullAddress = `${address.street}, ${address.postalCode} ${address.district
           sonuçlandırılacaktır.
         </p>
       </article>
+        )
+      }
     </div>
   </section>
 </BaseLayout>

@@ -1,5 +1,7 @@
 ---
 import { withBase } from '@/utils/paths';
+import { getLocale, localeMeta } from '@/i18n/config';
+import { t } from '@/i18n/ui';
 import '@/styles/global.css';
 import SEO, { type SeoProps } from '@/components/SEO.astro';
 import Header from '@/components/Header.astro';
@@ -12,10 +14,12 @@ interface Props extends SeoProps {
 }
 
 const { headerMode = 'overlay', ...seo } = Astro.props;
+const locale = getLocale(Astro.url);
+const ui = t(locale);
 ---
 
 <!doctype html>
-<html lang="tr">
+<html lang={localeMeta[locale].htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -34,7 +38,7 @@ const { headerMode = 'overlay', ...seo } = Astro.props;
     <SEO {...seo} />
   </head>
   <body>
-    <a class="skip-link" href="#main">İçeriğe geç</a>
+    <a class="skip-link" href="#main">{ui.skipToContent}</a>
     <Header mode={headerMode} />
     <main id="main" tabindex="-1">
       <slot />

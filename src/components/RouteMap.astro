@@ -1,0 +1,207 @@
+---
+/**
+ * Dot-matrix map with real project routes. Uses the same Natural Earth projection as the
+ * global network map (see scripts/generate-assets.mjs), computed at build time — no client JS.
+ * With a single route the view zooms to the region around it.
+ */
+import { geoNaturalEarth1 } from 'd3-geo';
+import map from '@/data/world-map.json';
+
+type Pt = [number, number];
+type Place = { name: string; lon: number; lat: number };
+
+interface Props {
+  routes: { from?: Place; to?: Place; href?: string; label?: string }[];
+  title: string;
+  /** Zoom to the bounding box of the routes (detail pages) */
+  zoom?: boolean;
+  class?: string;
+}
+
+const { routes, title, zoom = false, class: className } = Astro.props;
+const { width, height, dots } = map as unknown as { width: number; height: number; dots: Pt[] };
+
+const projection = geoNaturalEarth1().fitExtent(
+  [
+    [0, 0],
+    [width, height],
+  ],
+  { type: 'Sphere' },
+);
+const project = (p: Place): Pt => projection([p.lon, p.lat]) as Pt;
+
+const arc = ([x1, y1]: Pt, [x2, y2]: Pt) => {
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  const lift = Math.min(dist * 0.3, 120);
+  return `M${x1.toFixed(1)} ${y1.toFixed(1)} Q${((x1 + x2) / 2).toFixed(1)} ${((y1 + y2) / 2 - lift).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+};
+
+// Unique places (by name) so shared hubs like Istanbul get a single marker and label
+const placeMap = new Map<string, { name: string; at: Pt; count: number }>();
+for (const r of routes) {
+  for (const p of [r.from, r.to]) {
+    if (!p) continue;
+    const e = placeMap.get(p.name) ?? { name: p.name, at: project(p), count: 0 };
+    e.count++;
+    placeMap.set(p.name, e);
+  }
+}
+// Hubs first; drop labels that would collide with an already placed one (dense clusters such as NW Europe)
+const nodes = [...placeMap.values()]
+  .sort((a, b) => b.count - a.count)
+  .map((n, i, arr) => ({
+    ...n,
+    label: zoom || !arr.slice(0, i).some((m) => Math.abs(m.at[0] - n.at[0]) < 46 && Math.abs(m.at[1] - n.at[1]) < 14),
+  }));
+const arcs = routes.filter((r) => r.from && r.to).map((r) => ({ d: arc(project(r.from!), project(r.to!)), href: r.href, label: r.label }));
+
+// View box
+const ys = dots.map(([, y]) => y);
+let vb = { x: 0, y: Math.floor(Math.min(...ys) - 14), w: width, h: Math.ceil(Math.max(...ys) + 14) - Math.floor(Math.min(...ys) - 14) };
+if (zoom && nodes.length) {
+  const xs = nodes.map((n) => n.at[0]);
+  const yy = nodes.map((n) => n.at[1]);
+  const pad = 70;
+  let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad;
+  let y0 = Math.min(...yy) - pad - 60, y1 = Math.max(...yy) + pad;
+  // keep a 2:1 frame and a sensible minimum size
+  let w = Math.max(x1 - x0, 300), h = Math.max(y1 - y0, 150);
+  if (w / h > 2) h = w / 2; else w = h * 2;
+  const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...yy) + Math.max(...yy)) / 2 - 20;
+  x0 = Math.max(0, Math.min(width - w, cx - w / 2));
+  y0 = Math.max(vb.y, cy - h / 2);
+  vb = { x: x0, y: y0, w, h };
+}
+const scale = vb.w / width; // shrink strokes/labels when zoomed in
+const dotPath = dots.map(([x, y]) => `M${x} ${y}h0`).join('');
+---
+
+<figure class:list={['rm', zoom && 'rm--zoom', className]} data-reveal="fade" style={`--s:${scale.toFixed(3)}`}>
+  <svg viewBox={`${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`} role="img" aria-label={title} preserveAspectRatio="xMidYMid meet">
+    <path d={dotPath} class="rm__land" />
+    <g class="rm__arcs">
+      {
+        arcs.map((a, i) => (
+          <g style={`--i:${i}`}>
+            <path d={a.d} pathLength="1" class="rm__arc" />
+            <circle r={(3.4 * scale).toFixed(2)} class="rm__plane" opacity="0">
+              <animateMotion dur="6s" repeatCount="indefinite" begin={`${(2 + i * 0.5).toFixed(1)}s`} path={a.d} keyPoints="0;1;1" keyTimes="0;0.6;1" calcMode="linear" />
+              <animate attributeName="opacity" dur="6s" repeatCount="indefinite" begin={`${(2 + i * 0.5).toFixed(1)}s`} values="0;1;1;0;0" keyTimes="0;0.08;0.58;0.66;1" />
+            </circle>
+          </g>
+        ))
+      }
+    </g>
+    <g class="rm__nodes">
+      {
+        nodes.map((n, i) => (
+          <g class="rm__node" style={`--i:${i}`}>
+            <circle cx={n.at[0]} cy={n.at[1]} r={((n.count > 1 ? 4.5 : 3.4) * scale).toFixed(2)} stroke-width={(1.4 * scale).toFixed(2)} class:list={[n.count > 1 && 'rm__hub']} />
+            {n.label && <text x={n.at[0] + 8 * scale} y={n.at[1] - 8 * scale}>{n.name}</text>}
+          </g>
+        ))
+      }
+    </g>
+  </svg>
+</figure>
+
+<style>
+  .rm svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .rm--zoom .rm__node text {
+    font-size: calc(19px * var(--s));
+  }
+
+  .rm--zoom .rm__arc {
+    stroke-width: calc(2.4px * var(--s));
+  }
+
+  .rm--zoom svg {
+    overflow: hidden;
+  }
+
+  .rm__land {
+    fill: none;
+    stroke: rgba(182, 216, 230, 0.3);
+    stroke-width: 3.8px;
+    stroke-linecap: round;
+  }
+
+  .rm__arc {
+    fill: none;
+    stroke: var(--brand-300);
+    stroke-width: calc(1.3px * var(--s));
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0.85;
+  }
+
+  .rm__plane {
+    fill: var(--white);
+  }
+
+  .rm__node circle {
+    fill: var(--ink-900);
+    stroke: var(--brand-200);
+  }
+
+  .rm__node .rm__hub {
+    fill: var(--white);
+    stroke: var(--brand-300);
+  }
+
+  .rm__node text {
+    font-family: var(--font-mono);
+    font-size: calc(11px * var(--s));
+    letter-spacing: 0.06em;
+    fill: var(--text-inv-2);
+  }
+
+  .rm__node {
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out);
+    transition-delay: calc(0.6s + var(--i) * 0.05s);
+  }
+
+  .rm.is-visible .rm__arc {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.6s var(--ease-in-out);
+    transition-delay: calc(0.15s + var(--i) * 0.1s);
+  }
+
+  .rm.is-visible .rm__node {
+    opacity: 1;
+  }
+
+  :global(html:not(.js)) .rm__arc,
+  :global(html:not(.js)) .rm__node {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rm__arc {
+      stroke-dashoffset: 0;
+    }
+    .rm__node {
+      opacity: 1;
+    }
+    .rm__plane {
+      display: none;
+    }
+  }
+  @media (max-width: 639px) {
+    .rm__node text {
+      font-size: calc(20px * var(--s));
+    }
+
+    .rm__land {
+      stroke-width: 4.6px;
+    }
+  }
+</style>

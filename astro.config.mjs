@@ -8,10 +8,13 @@ import sitemap from '@astrojs/sitemap';
  */
 const site = process.env.SITE_URL || 'https://www.uniqueaircargo.com';
 const base = process.env.BASE_PATH || '/';
+// Optional: build outside the project folder (e.g. to keep OneDrive from syncing/deleting build output)
+const outDir = process.env.OUT_DIR || './dist';
 
 export default defineConfig({
   site,
   base,
+  outDir,
   trailingSlash: 'never',
   build: { format: 'file' },
   integrations: [sitemap({ filter: (page) => !page.includes('/404') })],

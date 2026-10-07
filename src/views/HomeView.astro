@@ -1,0 +1,788 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ServiceIndex from '@/components/ServiceIndex.astro';
+import WorldMap from '@/components/WorldMap.astro';
+import ScenarioTabs from '@/components/ScenarioTabs.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+import { pathTo, quoteHash, type Locale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { getProjects, projectImage } from '@/data/projects';
+
+import ctaImage from '@/assets/images/night-approach.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const heroImage = projectImage('ataturk-airport-last-flight', 2);
+const featured = getProjects(locale).slice(0, 3);
+
+const copy = {
+  en: {
+    description:
+      'Unique Air Cargo is an Istanbul-based aircraft charter company. Cargo, heavy and outsized freight, dangerous goods, time-critical, VIP jet, group and air ambulance flights, backed by local representatives in seven regions.',
+    heroAlt: 'Heavy-lift freighter on the apron at sunset',
+    eyebrow: 'Cargo & passenger charter · Istanbul',
+    title: 'The right aircraft in the air,',
+    accent: 'the right team on the ground.',
+    lead: 'From heavy and outsized cargo to dangerous goods, from VIP flights to air ambulances, we plan every charter request from Istanbul and turn it into an operation through our global network of representatives.',
+    explore: 'Explore Our Services',
+    facts: [
+      { label: 'Reach', text: 'Local representatives in 7 regions' },
+      { label: 'Standards', text: 'Compliant with ICAO & IATA rules' },
+      { label: 'Scope', text: 'Cargo, passenger and medical charter' },
+    ],
+    introEyebrow: 'Who we are',
+    statement: 'We start where scheduled flights fall short.',
+    statementMuted:
+      'Whatever the size of the cargo, the complexity of the route or the pressure of the deadline, we find the right aircraft and manage the operation end to end.',
+    introBody:
+      'Unique Air Cargo is an aviation company headquartered in Istanbul, specialising in aircraft charter with a team of experienced professionals who have worked in the industry for many years. Our core business is to fully understand our clients’ needs, solve them economically, and support cargo companies around the world with their strategic transport requirements.',
+    aboutLink: 'About us',
+    principles: [
+      { title: 'Understand the need', text: 'Every request starts by assessing the cargo, the route and the timing together.' },
+      { title: 'Economic solutions', text: 'Suitable aircraft options are compared and quoted at market rates.' },
+      { title: 'Fast response', text: 'Our goal is to resolve every charter request as quickly as possible.' },
+      { title: 'Safety first', text: 'Operations compliant with ICAO and IATA rules, with flight safety as the priority.' },
+    ],
+    servicesEyebrow: 'Our services',
+    servicesTitle: 'Every cargo, every passenger,',
+    servicesAccent: 'every route.',
+    servicesLead:
+      'Charter solutions across eleven areas of expertise for cargo, passenger and special operations — each planned around the specific requirements of the load or the journey.',
+    globalEyebrow: 'Global reach',
+    globalTitle: 'From Istanbul',
+    globalAccent: 'to seven regions.',
+    globalLead:
+      'Our head office in Istanbul, the city that connects Asia and Europe, works alongside local representatives in Europe, the CIS, Russia, Africa, the Middle East, the Far East and the USA.',
+    globalText:
+      'That means your request is handled by a network that knows the rules, the airports and the conditions of the region where the flight takes place.',
+    stats: [
+      { label: 'Continents', value: '7', text: 'Charter solutions on seven continents' },
+      { label: 'Representation', value: '7', text: 'Regions with local representatives' },
+      { label: 'Expertise', value: '11', text: 'Charter service areas' },
+      { label: 'Head office', value: 'IST', text: 'Where Asia meets Europe' },
+    ],
+    projectsEyebrow: 'Projects',
+    projectsTitle: 'Real operations,',
+    projectsAccent: 'from our own archive.',
+    projectsLead: 'Bridge components from Hong Kong to Riyadh, dangerous goods to N’Djamena, aircraft engines into Istanbul — a few of the operations we have flown.',
+    scenariosEyebrow: 'Operational scenarios',
+    scenariosTitle: 'Real-world needs,',
+    scenariosAccent: 'carefully planned.',
+    scenariosLead:
+      'The illustrative scenarios below show when charter comes into play and how an operation is planned step by step.',
+    trustEyebrow: 'Our commitment',
+    trustLead:
+      'Our motto is not a slogan but the way we work: safety first, then speed, in every operation; understanding the need first, then building the solution, in every request.',
+    assurances: [
+      { label: 'Standards', text: 'Charter operations compliant with ICAO and IATA rules' },
+      { label: 'Dangerous goods', text: 'A team trained in the IATA Dangerous Goods Regulations' },
+      { label: 'Permits', text: 'Coordination for shipments requiring diplomatic or special permits' },
+      { label: 'Medical', text: 'At least one doctor and one licensed nurse on every air ambulance flight' },
+      { label: 'Head office', text: 'Istanbul — where Asia meets Europe' },
+    ],
+  },
+  tr: {
+    description:
+      'Unique Air Cargo; İstanbul merkezli charter uçak kiralama şirketi. Kargo, ağır ve büyük hacimli yük, tehlikeli madde, acil sevkiyat, VIP jet, grup ve ambulans uçuşları için 7 bölgede yerel temsilci ağıyla global çözümler.',
+    heroAlt: 'Gün batımında apronda bekleyen ağır nakliye uçağı',
+    eyebrow: 'Kargo & yolcu charter · İstanbul',
+    title: 'Gökyüzünde doğru uçak,',
+    accent: 'yerde doğru ekip.',
+    lead: 'Ağır ve büyük hacimli yükten tehlikeli maddeye, VIP uçuştan ambulans uçağa kadar her charter talebini İstanbul’dan planlıyor, global temsilci ağımızla operasyona dönüştürüyoruz.',
+    explore: 'Hizmetleri Keşfedin',
+    facts: [
+      { label: 'Erişim', text: '7 bölgede yerel temsilci' },
+      { label: 'Standart', text: 'ICAO & IATA kurallarına uygun' },
+      { label: 'Kapsam', text: 'Kargo, yolcu ve medikal charter' },
+    ],
+    introEyebrow: 'Biz kimiz',
+    statement: 'Tarifeli uçuşların yetmediği yerde başlıyoruz.',
+    statementMuted:
+      'Yükün ölçüsü, rotanın zorluğu ya da zamanın darlığı fark etmez; doğru uçağı bulur, operasyonu uçtan uca yönetiriz.',
+    introBody:
+      'Unique Air Cargo, merkezi İstanbul’da bulunan ve havacılık sektöründe uzun yıllar çalışmış deneyimli kadrosuyla uçak kiralama alanında faaliyet gösteren bir havacılık şirketidir. Temel işimiz; müşterilerimizin ihtiyaçlarını tam olarak anlamak, bu ihtiyaçları ekonomik biçimde çözmek ve dünya genelindeki kargo şirketlerinin stratejik taşımacılık ihtiyaçlarına destek olmaktır.',
+    aboutLink: 'Kurumsal',
+    principles: [
+      { title: 'İhtiyacı tam anlamak', text: 'Her talep; yükün, rotanın ve zamanın birlikte değerlendirilmesiyle başlar.' },
+      { title: 'Ekonomik çözüm', text: 'Uygun uçak seçenekleri karşılaştırılır, piyasa koşullarına uygun teklif sunulur.' },
+      { title: 'En hızlı yanıt', text: 'Amacımız her kiralama talebini en kısa sürede çözüme kavuşturmaktır.' },
+      { title: 'Önce emniyet', text: 'ICAO ve IATA kurallarına uygun, uçuş emniyetini önceleyen operasyon.' },
+    ],
+    servicesEyebrow: 'Hizmetlerimiz',
+    servicesTitle: 'Her yük, her yolcu,',
+    servicesAccent: 'her rota için.',
+    servicesLead:
+      'Kargo, yolcu ve özel operasyonlar için on bir uzmanlık alanında charter çözümleri. Her biri, yükün ya da yolculuğun kendine özgü gerekliliklerine göre planlanır.',
+    globalEyebrow: 'Global erişim',
+    globalTitle: 'İstanbul’dan',
+    globalAccent: 'yedi bölgeye.',
+    globalLead:
+      'Asya ile Avrupa’yı birleştiren İstanbul’daki merkezimiz; Avrupa, BDT ülkeleri, Rusya, Afrika, Orta Doğu, Uzak Doğu ve ABD’deki yerel temsilcilerimizle birlikte çalışır.',
+    globalText:
+      'Böylece taleplerinize, uçuşun gerçekleşeceği bölgenin kurallarını, havalimanlarını ve koşullarını bilen bir ağla yanıt veririz.',
+    stats: [
+      { label: 'Kıta', value: '7', text: 'Yedi kıtada charter çözümleri' },
+      { label: 'Temsil', value: '7', text: 'Bölgede yerel temsilci' },
+      { label: 'Uzmanlık', value: '11', text: 'Charter hizmet alanı' },
+      { label: 'Merkez', value: 'IST', text: 'Asya ile Avrupa’nın kesişiminde' },
+    ],
+    projectsEyebrow: 'Projeler',
+    projectsTitle: 'Gerçek operasyonlar,',
+    projectsAccent: 'kendi arşivimizden.',
+    projectsLead: 'Hong Kong’dan Riyad’a köprü bileşenleri, N’Djamena’ya tehlikeli madde, İstanbul’a uçak motorları — gerçekleştirdiğimiz operasyonlardan bazıları.',
+    scenariosEyebrow: 'Operasyon senaryoları',
+    scenariosTitle: 'Gerçek ihtiyaçlar,',
+    scenariosAccent: 'kurgulanmış çözümler.',
+    scenariosLead:
+      'Aşağıdaki temsili senaryolar, charter taşımacılığın hangi durumlarda devreye girdiğini ve bir operasyonun adım adım nasıl kurgulandığını gösterir.',
+    trustEyebrow: 'Kurumsal güvence',
+    trustLead:
+      'Sloganımız bir söz değil, çalışma biçimimiz: Her operasyonda önce emniyet, sonra hız; her talepte önce ihtiyacı anlamak, sonra çözüm üretmek.',
+    assurances: [
+      { label: 'Standart', text: 'ICAO ve IATA kurallarına uygun charter operasyonları' },
+      { label: 'Tehlikeli madde', text: 'IATA Tehlikeli Madde Regülasyonları konusunda eğitimli ekip' },
+      { label: 'İzinler', text: 'Diplomatik ve özel izin gerektiren sevkiyatlarda koordinasyon' },
+      { label: 'Medikal', text: 'Her ambulans uçuşunda en az bir doktor ve yetkili hemşire' },
+      { label: 'Merkez', text: 'İstanbul — Asya ile Avrupa’nın kesişim noktası' },
+    ],
+  },
+}[locale];
+
+const servicesAnchor = locale === 'tr' ? 'hizmetler' : 'services';
+---
+
+<BaseLayout description={copy.description}>
+  <!-- ============================================================ HERO -->
+  <section class="hero on-dark" aria-labelledby="hero-title">
+    <div class="hero__media">
+      <Picture
+        src={heroImage}
+        alt={copy.heroAlt}
+        formats={['avif', 'webp']}
+        widths={[640, 960, 1280, 1600, 2000]}
+        sizes="(min-width: 1024px) 58vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+    <div class="hero__scrim" aria-hidden="true"></div>
+
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <p class="eyebrow hero__eyebrow" data-reveal>{copy.eyebrow}</p>
+        <h1 class="hero__title display" id="hero-title" data-reveal style="--reveal-delay:80">
+          {copy.title}
+          <em>{copy.accent}</em>
+        </h1>
+        <p class="hero__lead" data-reveal style="--reveal-delay:160">{copy.lead}</p>
+        <div class="btn-row hero__actions" data-reveal style="--reveal-delay:240">
+          <a href={pathTo(locale, 'contact', quoteHash[locale])} class="btn btn--light">{ui.nav.requestQuote} <Icon name="arrow-right" /></a>
+          <a href={`#${servicesAnchor}`} class="btn btn--ghost-light">{copy.explore}</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__bar">
+      <div class="container">
+        <dl class="hero__facts" data-reveal="fade" style="--reveal-delay:400">
+          {
+            copy.facts.map((f) => (
+              <div>
+                <dt>{f.label}</dt>
+                <dd>{f.text}</dd>
+              </div>
+            ))
+          }
+          <div class="hero__call">
+            <dt>{ui.nav.charterLine}</dt>
+            <dd><a href={site.contact.phoneHref}>{site.contact.phone}</a></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ VALUE PROPOSITION -->
+  <section class="section intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid">
+        <p class="eyebrow" data-reveal>{copy.introEyebrow}</p>
+        <div>
+          <h2 class="intro__statement" id="intro-title" data-reveal>
+            {copy.statement} <span>{copy.statementMuted}</span>
+          </h2>
+          <div class="intro__body" data-reveal>
+            <p>{copy.introBody}</p>
+            <a href={pathTo(locale, 'about')} class="link-arrow">{copy.aboutLink} <Icon name="arrow-right" /></a>
+          </div>
+        </div>
+      </div>
+
+      <ol class="principles" role="list">
+        {
+          copy.principles.map((p, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 80}`}>
+              <span class="principles__num">0{i + 1}</span>
+              <h3 class="h4">{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================================================ GLOBAL REACH -->
+  <section class="section surface-ink global" aria-labelledby="global-title">
+    <div class="container">
+      <div class="global__head">
+        <div data-reveal>
+          <p class="eyebrow">{copy.globalEyebrow}</p>
+          <h2 class="h2 global__title" id="global-title">{copy.globalTitle} <em>{copy.globalAccent}</em></h2>
+        </div>
+        <div class="global__text" data-reveal style="--reveal-delay:100">
+          <p class="lead">{copy.globalLead}</p>
+          <p>{copy.globalText}</p>
+        </div>
+      </div>
+
+      <WorldMap />
+
+      <dl class="global__stats">
+        {
+          copy.stats.map((s, i) => (
+            <div data-reveal style={`--reveal-delay:${i * 80}`}>
+              <dt>{s.label}</dt>
+              <dd>{s.value}</dd>
+              <p>{s.text}</p>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============================================================ SERVICES -->
+  <section class="section" id={servicesAnchor} aria-labelledby="services-title">
+    <div class="container">
+      <SectionHeader
+        id="services-title"
+        eyebrow={copy.servicesEyebrow}
+        title={copy.servicesTitle}
+        accent={copy.servicesAccent}
+        lead={copy.servicesLead}
+        layout="split"
+      >
+        <a href={pathTo(locale, 'services')} class="link-arrow">{ui.nav.allServices} <Icon name="arrow-right" /></a>
+      </SectionHeader>
+      <ServiceIndex />
+    </div>
+  </section>
+
+  <!-- ============================================================ PROJECTS -->
+  <section class="section surface-white projects" aria-labelledby="projects-title">
+    <div class="container">
+      <SectionHeader
+        id="projects-title"
+        eyebrow={copy.projectsEyebrow}
+        title={copy.projectsTitle}
+        accent={copy.projectsAccent}
+        lead={copy.projectsLead}
+        layout="split"
+      >
+        <a href={pathTo(locale, 'projects')} class="link-arrow">{ui.project.all} <Icon name="arrow-right" /></a>
+      </SectionHeader>
+      <div class="projects__grid">
+        {featured.map((p, i) => <ProjectCard project={p} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ SCENARIOS -->
+  <section class="section" aria-labelledby="scenarios-title">
+    <div class="container">
+      <SectionHeader
+        id="scenarios-title"
+        eyebrow={copy.scenariosEyebrow}
+        title={copy.scenariosTitle}
+        accent={copy.scenariosAccent}
+        lead={copy.scenariosLead}
+        layout="split"
+      />
+      <ScenarioTabs />
+    </div>
+  </section>
+
+  <!-- ============================================================ TRUST -->
+  <section class="section surface-white trust" aria-labelledby="trust-title">
+    <div class="container trust__grid">
+      <div class="trust__motto" data-reveal>
+        <p class="eyebrow">{copy.trustEyebrow}</p>
+        <h2 class="trust__title" id="trust-title">Above All, <em>We Care.</em></h2>
+        <p class="lead">{copy.trustLead}</p>
+      </div>
+      <dl class="trust__list">
+        {
+          copy.assurances.map((a, i) => (
+            <div data-reveal style={`--reveal-delay:${i * 70}`}>
+              <dt>{a.label}</dt>
+              <dd>{a.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <CtaBand image={ctaImage} />
+</BaseLayout>
+
+<style>
+  /* ---------------------------------------------------------------- Hero */
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: clamp(640px, 100svh, 1000px);
+    background: var(--ink-950);
+    color: var(--text-inv);
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .hero__media {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 58%;
+    z-index: -2;
+  }
+
+  .hero__media :global(picture) {
+    display: block;
+    height: 100%;
+  }
+
+  .hero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 60%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__media :global(img) {
+      animation: hero-in 2.8s var(--ease-out) both;
+    }
+  }
+
+  @keyframes hero-in {
+    from {
+      transform: scale(1.1);
+      opacity: 0.3;
+    }
+  }
+
+  .hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to right, var(--ink-950) 38%, rgba(5, 9, 15, 0.75) 50%, rgba(5, 9, 15, 0.1) 72%, rgba(5, 9, 15, 0) 100%),
+      linear-gradient(to top, rgba(5, 9, 15, 0.85) 0%, rgba(5, 9, 15, 0) 30%);
+  }
+
+  .hero__inner {
+    display: flex;
+    align-items: center;
+    padding-top: calc(var(--header-h) + 3rem);
+    padding-bottom: 3rem;
+  }
+
+  .hero__content {
+    max-width: 700px;
+  }
+
+  .hero__eyebrow {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-200);
+  }
+
+  .hero__lead {
+    max-width: 50ch;
+    margin-top: 1.5rem;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--text-inv-2);
+  }
+
+  .hero__actions {
+    margin-top: 2.25rem;
+  }
+
+  .hero__bar {
+    border-top: 1px solid var(--line-inv);
+    background: linear-gradient(to right, rgba(5, 9, 15, 0.9), rgba(5, 9, 15, 0.4));
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .hero__facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .hero__facts > div {
+    padding: 1.5rem 1.5rem 1.6rem;
+    border-left: 1px solid var(--line-inv);
+  }
+
+  .hero__facts > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .hero__facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-300);
+  }
+
+  .hero__facts dd {
+    margin-top: 0.4rem;
+    font-size: 0.975rem;
+    color: var(--text-inv);
+  }
+
+  .hero__call dd a {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.25s;
+  }
+
+  .hero__call dd a:hover {
+    color: var(--brand-300);
+  }
+
+  @media (max-width: 1023px) {
+    .hero__media {
+      width: 100%;
+    }
+
+    .hero__scrim {
+      background:
+        linear-gradient(to top, var(--ink-950) 6%, rgba(5, 9, 15, 0.85) 38%, rgba(5, 9, 15, 0.2) 68%, rgba(5, 9, 15, 0.5) 100%);
+    }
+
+    .hero__inner {
+      align-items: flex-end;
+      padding-top: calc(var(--header-h) + 8rem);
+    }
+
+    .hero__facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hero__facts > div {
+      padding: 1.1rem 1rem 1.2rem;
+      border-top: 1px solid var(--line-inv);
+    }
+
+    .hero__facts > div:nth-child(-n + 2) {
+      border-top: 0;
+    }
+
+    .hero__facts > div:nth-child(odd) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .hero__facts dd {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* ---------------------------------------------------------------- Intro */
+  .intro__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    gap: 2rem 4rem;
+  }
+
+  .intro__grid > .eyebrow {
+    align-self: start;
+    padding-top: 0.9rem;
+  }
+
+  .intro__statement {
+    font-size: clamp(1.45rem, 1.15rem + 1.25vw, 2.3rem);
+    line-height: 1.16;
+    letter-spacing: -0.022em;
+    max-width: 34ch;
+  }
+
+  .intro__statement span {
+    color: var(--text-3);
+  }
+
+  .intro__body {
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+    max-width: 62ch;
+    margin-top: 2.5rem;
+    color: var(--text-2);
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+    margin-top: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  .principles li {
+    display: grid;
+    align-content: start;
+    gap: 0.7rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--text);
+  }
+
+  .principles__num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .principles p {
+    font-size: var(--fs-small);
+    color: var(--text-2);
+  }
+
+  @media (max-width: 899px) {
+    .intro__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .intro__grid > .eyebrow {
+      padding-top: 0;
+    }
+
+    .principles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2.5rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .principles {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* ---------------------------------------------------------------- Global */
+  .global {
+    overflow: hidden;
+  }
+
+  .global__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem 4rem;
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+
+  .global__title {
+    margin-top: 1.25rem;
+  }
+
+  .global__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-300);
+  }
+
+  .global__text {
+    display: grid;
+    gap: 1rem;
+    color: var(--text-inv-2);
+  }
+
+  .global__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: clamp(2.5rem, 2rem + 3vw, 5rem);
+    border-top: 1px solid var(--line-inv-strong);
+  }
+
+  .global__stats > div {
+    display: grid;
+    grid-template-areas: 'dt' 'dd' 'p';
+    gap: 0.4rem;
+    padding: 1.75rem 1.5rem 0;
+    border-left: 1px solid var(--line-inv);
+  }
+
+  .global__stats > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .global__stats dt {
+    grid-area: dt;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-inv-3);
+  }
+
+  .global__stats dd {
+    grid-area: dd;
+    font-family: var(--font-serif);
+    font-size: clamp(2.1rem, 1.8rem + 1.2vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--white);
+  }
+
+  .global__stats p {
+    grid-area: p;
+    font-size: var(--fs-small);
+    color: var(--text-inv-2);
+  }
+
+  @media (max-width: 899px) {
+    .global__head {
+      grid-template-columns: 1fr;
+    }
+
+    .global__stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .global__stats > div {
+      padding: 1.5rem 1rem 1.5rem;
+    }
+
+    .global__stats > div:nth-child(odd) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .global__stats > div:nth-child(n + 3) {
+      border-top: 1px solid var(--line-inv);
+    }
+  }
+
+  /* ---------------------------------------------------------------- Projects */
+  .projects__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  @media (max-width: 899px) {
+    .projects__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .projects__grid > :global(:nth-child(3)) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 559px) {
+    .projects__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .projects__grid > :global(:nth-child(3)) {
+      display: block;
+    }
+  }
+
+  /* ---------------------------------------------------------------- Trust */
+  .trust__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem clamp(3rem, 7vw, 8rem);
+    align-items: start;
+  }
+
+  .trust__title {
+    margin: 1.5rem 0 1.75rem;
+    font-size: clamp(2.3rem, 1.6rem + 2.6vw, 3.9rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+
+  .trust__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  .trust__list > div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 1.25rem;
+    padding: 1.35rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .trust__list > div:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .trust__list dt {
+    padding-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .trust__list dd {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 899px) {
+    .trust__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .trust__list > div {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+  }
+</style>

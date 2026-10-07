@@ -1,0 +1,474 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import WorldMap from '@/components/WorldMap.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { getDefaultProcess } from '@/data/services';
+import { pathTo, type Locale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+
+import { projectImage } from '@/data/projects';
+import storyImage2 from '@/assets/images/cockpit.jpg';
+import ctaImage from '@/assets/images/sunset-sky-plane.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const heroImage = projectImage('istanbul-ndjamena-dangerous-goods', 1);
+const storyImage = projectImage('hong-kong-riyadh', 4);
+
+const copy = {
+  en: {
+    title: 'About Us',
+    description:
+      'Istanbul-based Unique Air Cargo arranges aircraft charter with an experienced team, local representatives in seven regions and operations compliant with ICAO and IATA rules.',
+    heroEyebrow: 'About us',
+    heroTitle: 'Proud to be',
+    heroAccent: 'Unique.',
+    heroLead:
+      'Unique Air Cargo is an Istanbul-based aviation company specialising in aircraft charter, run by an experienced, professional team with many years in the aviation industry.',
+    heroAlt: 'Dangerous goods consignment beside a Unique Air Cargo banner on the apron',
+    knowUs: 'Get to Know Us',
+    storyEyebrow: 'Who we are',
+    storyTitle: 'From Istanbul to the world:',
+    storyAccent: 'a charter partner with reach.',
+    story: [
+      'Our head office is in <strong>Istanbul</strong> — one of the world’s most beautiful cities, connecting Asia and Europe. The location gives us a natural advantage for operations between Europe, the Middle East, Africa and Asia.',
+      'Our core business is to fully understand our clients’ needs, solve them economically and support cargo companies around the world with their strategic transport requirements. Our priority is to resolve every aircraft charter request <strong>at competitive market prices</strong> and <strong>as quickly as possible</strong>.',
+      'Working with local representatives in Europe, the CIS, Russia, Africa, the Middle East, the Far East and the USA, we deliver solutions on seven continents that put flight safety first and are <strong>compliant with ICAO and IATA rules</strong>.',
+    ],
+    storyAlt1: 'Wide-body freighter being loaded at night at Hong Kong International Airport',
+    storyAlt2: 'Runway approach seen from the cockpit',
+    mvvTitle: 'Mission, vision and values',
+    missionLabel: 'Our mission',
+    mission: ['To resolve every aircraft charter request at competitive prices and', 'as quickly as possible.'],
+    visionLabel: 'Our vision',
+    vision: ['To be the charter partner', 'clients call first', 'when an operation is critical.'],
+    valuesLabel: 'Our values',
+    values: [
+      { title: 'Safety first', text: 'Flight safety is a precondition of every decision; speed never comes before safety.' },
+      { title: 'Understanding the need', text: 'Before the solution, we get the question right: cargo, route, timing and constraints.' },
+      { title: 'Transparency', text: 'Options, constraints and costs are shared openly from the start.' },
+      { title: 'Speed', text: 'We aim to resolve every charter request in the shortest possible time.' },
+      { title: 'Care', text: 'Above All, We Care: every shipment and every passenger matters to us.' },
+    ],
+    networkEyebrow: 'Global network',
+    networkTitle: 'From where Asia meets Europe',
+    networkAccent: 'to seven regions.',
+    networkLead:
+      'Our local representatives know the rules, airports and conditions of the regions where flights take place, and work hand in hand with our team in Istanbul.',
+    regions: ['Europe', 'CIS countries', 'Russia', 'Africa', 'Middle East', 'Far East', 'USA'],
+    howEyebrow: 'How we work',
+    howTitle: 'A reliable process,',
+    howAccent: 'from start to finish.',
+    howLead:
+      'Every request follows the same discipline, so at every stage of the operation it is clear what will be done, when, and by whom.',
+    stdEyebrow: 'Standards',
+    stdTitle: 'Rules are',
+    stdAccent: 'the foundation of trust.',
+    standards: [
+      { code: 'ICAO', text: 'Operational planning in line with International Civil Aviation Organization rules.' },
+      { code: 'IATA', text: 'Compliance with International Air Transport Association rules and practices.' },
+      { code: 'IATA DGR', text: 'An operations team trained in the Dangerous Goods Regulations.' },
+      { code: 'KVKK', text: 'Client data protected under Turkey’s Personal Data Protection Law No. 6698.' },
+    ],
+    ctaEyebrow: 'Let’s work together',
+    ctaTitle: 'For a truly unique',
+    ctaAccent: 'operational experience.',
+  },
+  tr: {
+    title: 'Kurumsal',
+    description:
+      'İstanbul merkezli Unique Air Cargo; deneyimli kadrosu, 7 bölgedeki yerel temsilcileri ve ICAO & IATA kurallarına uygun operasyon anlayışıyla charter uçak kiralama hizmeti sunar.',
+    heroEyebrow: 'Kurumsal',
+    heroTitle: 'Benzersiz olmaktan',
+    heroAccent: 'gurur duyuyoruz.',
+    heroLead:
+      'Unique Air Cargo, havacılık sektöründe uzun yıllar çalışmış deneyimli ve profesyonel kadrosuyla, İstanbul merkezli olarak uçak kiralama alanında hizmet veren bir havacılık şirketidir.',
+    heroAlt: 'Apronda Unique Air Cargo pankartının önünde bekleyen sevkiyat',
+    knowUs: 'Bizi Tanıyın',
+    storyEyebrow: 'Biz kimiz',
+    storyTitle: 'İstanbul’dan dünyaya',
+    storyAccent: 'uzanan bir çözüm ortağı.',
+    story: [
+      'Merkezimiz, dünyanın en güzel şehirlerinden biri olan ve Asya ile Avrupa’yı birbirine bağlayan <strong>İstanbul’da</strong>. Bu konum; Avrupa, Orta Doğu, Afrika ve Asya arasındaki operasyonlarda bize doğal bir avantaj sağlıyor.',
+      'Temel işimiz; müşterilerimizin ihtiyaçlarını tam olarak anlamak, bu ihtiyaçları ekonomik biçimde çözmek ve dünya genelindeki kargo şirketlerinin stratejik taşımacılık ihtiyaçlarına destek olmaktır. Önceliğimiz, her türlü hava aracı kiralama talebini <strong>piyasa koşullarına uygun rekabetçi fiyatlarla</strong> ve <strong>en hızlı şekilde</strong> çözüme kavuşturmaktır.',
+      'Yedi kıtada; Avrupa, BDT ülkeleri, Rusya, Afrika, Orta Doğu, Uzak Doğu ve ABD’deki yerel temsilcilerimizle birlikte, uçuş emniyetini öncelik olarak kabul eden ve <strong>ICAO ile IATA kurallarına uygun</strong> çözümler sunuyoruz.',
+    ],
+    storyAlt1: 'Hong Kong Uluslararası Havalimanı’nda gece yüklenen geniş gövdeli kargo uçağı',
+    storyAlt2: 'Pist yaklaşmasında kokpitten görünüm',
+    mvvTitle: 'Misyon, vizyon ve değerler',
+    missionLabel: 'Misyonumuz',
+    mission: ['Her türlü hava aracı kiralama talebini, rekabetçi fiyatlarla ve', 'en hızlı şekilde', 'çözüme kavuşturmak.'],
+    visionLabel: 'Vizyonumuz',
+    vision: ['Kritik bir operasyon söz konusu olduğunda,', 'ilk aranan', 'charter çözüm ortağı olmak.'],
+    valuesLabel: 'Değerlerimiz',
+    values: [
+      { title: 'Önce emniyet', text: 'Uçuş emniyeti her kararın ön koşuludur; hız asla emniyetin önüne geçmez.' },
+      { title: 'İhtiyacı anlamak', text: 'Çözümden önce soruyu doğru anlarız: yük, rota, zaman ve kısıtlar.' },
+      { title: 'Şeffaflık', text: 'Seçenekler, kısıtlar ve maliyetler en baştan açıkça paylaşılır.' },
+      { title: 'Hız', text: 'Her kiralama talebini en kısa sürede çözüme kavuşturmayı hedefleriz.' },
+      { title: 'Özen', text: 'Above All, We Care: Her yük ve her yolcu bizim için tek ve özeldir.' },
+    ],
+    networkEyebrow: 'Global ağ',
+    networkTitle: 'Asya ile Avrupa’nın kesişiminden',
+    networkAccent: 'yedi bölgeye.',
+    networkLead:
+      'Yerel temsilcilerimiz; uçuşun gerçekleşeceği bölgenin kurallarını, havalimanlarını ve koşullarını bilen bir ağ olarak İstanbul’daki ekibimizle birlikte çalışır.',
+    regions: ['Avrupa', 'BDT Ülkeleri', 'Rusya', 'Afrika', 'Orta Doğu', 'Uzak Doğu', 'ABD'],
+    howEyebrow: 'Çalışma biçimimiz',
+    howTitle: 'Baştan sona',
+    howAccent: 'güvenilir bir süreç.',
+    howLead:
+      'Her talep, aynı disiplinle ele alınır. Böylece operasyonun her aşamasında neyin, ne zaman ve kim tarafından yapılacağı bellidir.',
+    stdEyebrow: 'Standartlar',
+    stdTitle: 'Kurallar,',
+    stdAccent: 'güvenin temelidir.',
+    standards: [
+      { code: 'ICAO', text: 'Uluslararası Sivil Havacılık Örgütü kurallarına uygun operasyon planlaması.' },
+      { code: 'IATA', text: 'Uluslararası Hava Taşımacılığı Birliği kural ve uygulamalarına uyum.' },
+      { code: 'IATA DGR', text: 'Tehlikeli Madde Regülasyonları konusunda eğitimli operasyon ekibi.' },
+      { code: 'KVKK', text: 'Müşteri verilerinin 6698 sayılı Kanun kapsamında korunması.' },
+    ],
+    ctaEyebrow: 'Birlikte çalışalım',
+    ctaTitle: 'Siz de benzersiz bir',
+    ctaAccent: 'operasyon deneyimi için.',
+  },
+}[locale];
+
+// Mission/vision lines: [plain, accent, plain] — the middle part is set in italic
+const [missionA, missionB = '', missionC = ''] = copy.mission;
+const [visionA, visionB = '', visionC = ''] = copy.vision;
+---
+
+<BaseLayout title={copy.title} description={copy.description} image={heroImage}>
+  <PageHero
+    eyebrow={copy.heroEyebrow}
+    title={copy.heroTitle}
+    accent={copy.heroAccent}
+    lead={copy.heroLead}
+    image={heroImage}
+    imageAlt={copy.heroAlt}
+    crumbs={[{ label: copy.title }]}
+    position="center 55%"
+  >
+    <a href="#story" class="btn btn--light">{copy.knowUs} <Icon name="arrow-down" /></a>
+    <a href={pathTo(locale, 'contact')} class="btn btn--ghost-light">{ui.cta.contactUs}</a>
+  </PageHero>
+
+  <!-- Story -->
+  <section class="section story" id="story" aria-labelledby="story-title">
+    <div class="container story__grid">
+      <div class="story__text">
+        <SectionHeader id="story-title" eyebrow={copy.storyEyebrow} title={copy.storyTitle} accent={copy.storyAccent} />
+        <div class="prose story__prose" data-reveal>
+          {copy.story.map((p) => <p set:html={p} />)}
+        </div>
+      </div>
+      <div class="story__media">
+        <div class="story__img story__img--a" data-reveal-mask>
+          <Image src={storyImage} alt={copy.storyAlt1} widths={[480, 720, 960]} sizes="(min-width: 1024px) 34vw, 70vw" loading="lazy" />
+        </div>
+        <div class="story__img story__img--b" data-reveal-mask>
+          <Image src={storyImage2} alt={copy.storyAlt2} widths={[360, 540, 720]} sizes="(min-width: 1024px) 22vw, 50vw" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission / vision / values -->
+  <section class="section surface-white mvv" aria-labelledby="mvv-title">
+    <div class="container">
+      <h2 class="visually-hidden" id="mvv-title">{copy.mvvTitle}</h2>
+      <div class="mvv__grid">
+        <article class="mvv__item" data-reveal>
+          <p class="eyebrow">{copy.missionLabel}</p>
+          <p class="mvv__statement">{missionA} <em>{missionB}</em> {missionC}</p>
+        </article>
+        <article class="mvv__item" data-reveal style="--reveal-delay:100">
+          <p class="eyebrow">{copy.visionLabel}</p>
+          <p class="mvv__statement">{visionA} <em>{visionB}</em> {visionC}</p>
+        </article>
+      </div>
+
+      <div class="values">
+        <p class="eyebrow values__label" data-reveal>{copy.valuesLabel}</p>
+        <ol class="values__list" role="list">
+          {
+            copy.values.map((v, i) => (
+              <li data-reveal style={`--reveal-delay:${i * 70}`}>
+                <span>0{i + 1}</span>
+                <h3 class="h4">{v.title}</h3>
+                <p>{v.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Network -->
+  <section class="section surface-ink network" aria-labelledby="network-title">
+    <div class="container">
+      <SectionHeader
+        id="network-title"
+        eyebrow={copy.networkEyebrow}
+        title={copy.networkTitle}
+        accent={copy.networkAccent}
+        lead={copy.networkLead}
+        layout="split"
+      />
+      <WorldMap />
+      <ul class="network__regions" role="list">
+        {copy.regions.map((r, i) => <li><span>0{i + 1}</span>{r}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- How we work -->
+  <section class="section" aria-labelledby="how-title">
+    <div class="container">
+      <SectionHeader
+        id="how-title"
+        eyebrow={copy.howEyebrow}
+        title={copy.howTitle}
+        accent={copy.howAccent}
+        lead={copy.howLead}
+        layout="split"
+      />
+      <ProcessSteps steps={getDefaultProcess(locale)} />
+    </div>
+  </section>
+
+  <!-- Standards -->
+  <section class="section surface-paper-2" aria-labelledby="std-title">
+    <div class="container std">
+      <div data-reveal>
+        <p class="eyebrow">{copy.stdEyebrow}</p>
+        <h2 class="h2 std__title" id="std-title">{copy.stdTitle} <em>{copy.stdAccent}</em></h2>
+      </div>
+      <dl class="std__list">
+        {
+          copy.standards.map((s, i) => (
+            <div data-reveal style={`--reveal-delay:${i * 70}`}>
+              <dt>{s.code}</dt>
+              <dd>{s.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <CtaBand eyebrow={copy.ctaEyebrow} title={copy.ctaTitle} accent={copy.ctaAccent} image={ctaImage} />
+</BaseLayout>
+
+<style>
+  /* Story */
+  .story__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem clamp(3rem, 7vw, 8rem);
+    align-items: center;
+  }
+
+  .story__prose p {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .story__media {
+    position: relative;
+    padding-bottom: 18%;
+  }
+
+  .story__img {
+    overflow: hidden;
+    background: var(--ink-800);
+  }
+
+  .story__img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .story__img--a {
+    width: 82%;
+    aspect-ratio: 4 / 5;
+  }
+
+  .story__img--b {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 48%;
+    aspect-ratio: 1;
+    border: 8px solid var(--paper);
+  }
+
+  @media (max-width: 1023px) {
+    .story__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .story__img--a {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  /* Mission / vision / values */
+  .mvv__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem clamp(3rem, 7vw, 8rem);
+  }
+
+  .mvv__statement {
+    margin-top: 1.5rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.4rem, 1.15rem + 1vw, 2.05rem);
+    line-height: 1.18;
+    letter-spacing: -0.022em;
+  }
+
+  .mvv__statement em {
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  .values {
+    margin-top: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  .values__label {
+    margin-bottom: 2rem;
+  }
+
+  .values__list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  .values__list li {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--text);
+  }
+
+  .values__list span {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .values__list p {
+    font-size: var(--fs-small);
+    color: var(--text-2);
+  }
+
+  @media (max-width: 1023px) {
+    .values__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 719px) {
+    .mvv__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .values__list {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Network */
+  .network {
+    overflow: hidden;
+  }
+
+  .network__regions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2.25rem;
+    margin-top: 3rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line-inv-strong);
+    font-size: 1.0625rem;
+  }
+
+  .network__regions span {
+    margin-right: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand-300);
+  }
+
+  /* Standards */
+  .std {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 3rem clamp(3rem, 7vw, 8rem);
+  }
+
+  .std__title {
+    margin-top: 1.25rem;
+  }
+
+  .std__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  .std__list > div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 1.5rem;
+    padding: 1.4rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .std__list > div:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .std__list dt {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
+    color: var(--brand-600);
+  }
+
+  .std__list dd {
+    color: var(--text-2);
+    padding-top: 0.2rem;
+  }
+
+  @media (max-width: 899px) {
+    .std {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .std__list > div {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+  }
+</style>

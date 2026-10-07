@@ -1,19 +1,24 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import { categories, serviceHref, type Service } from '@/data/services';
+import { getCategories, type LocalizedService } from '@/data/services';
+import { getLocale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
 
 interface Props {
-  service: Service;
+  service: LocalizedService;
   index?: number;
   headingLevel?: 'h2' | 'h3';
 }
 
 const { service, index, headingLevel: Heading = 'h3' } = Astro.props;
+const locale = getLocale(Astro.url);
+const categories = getCategories(locale);
+const ui = t(locale);
 ---
 
 <article class="card" data-reveal style={index !== undefined ? `--reveal-delay:${(index % 3) * 80}` : undefined}>
-  <a href={serviceHref(service.slug)} class="card__link">
+  <a href={service.href} class="card__link">
     <div class="card__media media media--zoom">
       <Image
         src={service.image}
@@ -28,7 +33,7 @@ const { service, index, headingLevel: Heading = 'h3' } = Astro.props;
       <Heading class="card__title">{service.title}</Heading>
       <p class="card__text">{service.summary}</p>
       <span class="card__more">
-        Detaylı bilgi <Icon name="arrow-right" size={16} />
+        {ui.card.more} <Icon name="arrow-right" size={16} />
       </span>
     </div>
   </a>

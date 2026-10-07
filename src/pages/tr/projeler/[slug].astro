@@ -1,0 +1,17 @@
+---
+import type { GetStaticPaths } from 'astro';
+import View from '@/views/ProjectDetailView.astro';
+import { getProjects, type LocalizedProject } from '@/data/projects';
+import { projectSlugs } from '@/data/project-slugs';
+
+export const getStaticPaths = (() =>
+  getProjects('tr').map((project) => ({ params: { slug: projectSlugs[project.id].tr }, props: { project } }))) satisfies GetStaticPaths;
+
+interface Props {
+  project: LocalizedProject;
+}
+
+const { project } = Astro.props;
+---
+
+<View locale="tr" project={project} />

@@ -1,6 +1,4 @@
 ---
-import { withBase } from '@/utils/paths';
-import type { GetStaticPaths } from 'astro';
 import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/PageHero.astro';
@@ -9,36 +7,85 @@ import ProcessSteps from '@/components/ProcessSteps.astro';
 import ServiceCard from '@/components/ServiceCard.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import Icon from '@/components/Icon.astro';
-import { services, categories, defaultProcess, getService, serviceHref, type Service } from '@/data/services';
+import { getCategories, getDefaultProcess, getService, type LocalizedService } from '@/data/services';
 import { site } from '@/data/site';
-
-export const getStaticPaths = (() =>
-  services.map((service) => ({ params: { slug: service.slug }, props: { service } }))) satisfies GetStaticPaths;
+import { pathTo, quoteHash, type Locale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
 
 interface Props {
-  service: Service;
+  locale: Locale;
+  service: LocalizedService;
 }
 
-const { service } = Astro.props;
-const related = service.related.map(getService).filter((s): s is Service => Boolean(s));
-const steps = service.process ?? defaultProcess;
-const quoteHref = withBase(`/iletisim?hizmet=${service.slug}#teklif`);
+const { locale, service } = Astro.props;
+const ui = t(locale);
+const related = service.related
+  .map((id) => getService(locale, id))
+  .filter((s): s is LocalizedService => Boolean(s));
+const steps = service.process ?? getDefaultProcess(locale);
+const quoteHref = pathTo(locale, 'contact', `?service=${service.id}${quoteHash[locale]}`);
 
-const toc = [
-  { id: 'genel-bakis', label: 'Genel bakış' },
-  { id: 'kullanim', label: 'Kullanım alanları' },
-  { id: 'avantajlar', label: 'Avantajlar' },
-  { id: 'surec', label: 'Operasyon süreci' },
-  { id: 'kabiliyetler', label: 'Kabiliyetler' },
-];
+const copy = {
+  en: {
+    callUs: 'Call Us',
+    tocLabel: 'On this page',
+    sections: { overview: 'Overview', uses: 'Applications', advantages: 'Advantages', process: 'Process', capabilities: 'Capabilities' },
+    ids: { overview: 'overview', uses: 'applications', advantages: 'advantages', process: 'process', capabilities: 'capabilities' },
+    usesEyebrow: 'Who · when',
+    advTitle: 'What makes the difference',
+    advAccent: 'in this operation.',
+    advLead: 'Every detail is planned so the operation runs safely, on time and predictably.',
+    processTitle: 'Step by step,',
+    processAccent: 'a transparent plan.',
+    processLead: 'From the moment we receive your request until delivery, you know what happens and when.',
+    capEyebrow: 'Operational capabilities',
+    capTitle: 'What our scope',
+    capAccent: 'covers.',
+    capLead: 'Each operation is planned by combining the following components as required.',
+    relatedEyebrow: 'Related solutions',
+    relatedTitle: 'You may also',
+    relatedAccent: 'be interested in.',
+    ctaTitle: 'Let’s plan this',
+    ctaAccent: 'operation together.',
+    serviceType: 'Charter flight',
+  },
+  tr: {
+    callUs: 'Bizi Arayın',
+    tocLabel: 'Bu sayfada',
+    sections: { overview: 'Genel bakış', uses: 'Kullanım alanları', advantages: 'Avantajlar', process: 'Operasyon süreci', capabilities: 'Kabiliyetler' },
+    ids: { overview: 'genel-bakis', uses: 'kullanim', advantages: 'avantajlar', process: 'surec', capabilities: 'kabiliyetler' },
+    usesEyebrow: 'Kimler · hangi durumlar',
+    advTitle: 'Bu operasyonda',
+    advAccent: 'farkı yaratan.',
+    advLead: 'Her detay, operasyonun güvenli, zamanında ve öngörülebilir ilerlemesi için planlanır.',
+    processTitle: 'Adım adım,',
+    processAccent: 'şeffaf bir plan.',
+    processLead: 'Talebinizi aldığımız andan teslimata kadar her aşamada neyin, ne zaman yapılacağını bilirsiniz.',
+    capEyebrow: 'Operasyonel kabiliyetler',
+    capTitle: 'Kapsamımızda',
+    capAccent: 'neler var?',
+    capLead: 'Her operasyon, ihtiyaca göre aşağıdaki bileşenlerin bir araya getirilmesiyle planlanır.',
+    relatedEyebrow: 'İlgili çözümler',
+    relatedTitle: 'Bunlar da',
+    relatedAccent: 'ilginizi çekebilir.',
+    ctaTitle: 'Bu operasyonu',
+    ctaAccent: 'birlikte planlayalım.',
+    serviceType: 'Charter uçuş',
+  },
+}[locale];
+
+const toc = (['overview', 'uses', 'advantages', 'process', 'capabilities'] as const).map((k) => ({
+  id: copy.ids[k],
+  label: copy.sections[k],
+}));
 
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
   name: service.title,
-  serviceType: 'Charter uçuş',
+  serviceType: copy.serviceType,
   description: service.seo.description,
-  url: new URL(serviceHref(service.slug), Astro.site).href,
+  url: new URL(service.href, Astro.site).href,
   provider: { '@id': `${site.url}/#organization` },
   areaServed: 'Worldwide',
 };
@@ -52,19 +99,19 @@ const serviceSchema = {
     lead={service.hero.lead}
     image={service.image}
     imageAlt={service.imageAlt}
-    crumbs={[{ label: 'Hizmetlerimiz', href: '/hizmetler' }, { label: service.title }]}
+    crumbs={[{ label: ui.nav.services, href: pathTo(locale, 'services') }, { label: service.title }]}
   >
-    <a href={quoteHref} class="btn btn--light">Teklif Al <Icon name="arrow-right" /></a>
-    <a href={site.contact.phoneHref} class="btn btn--ghost-light"><Icon name="phone" /> Bizi Arayın</a>
-    <nav slot="meta" class="toc" aria-label="Bu sayfada">
-      <p class="toc__label">{categories[service.category].label}</p>
+    <a href={quoteHref} class="btn btn--light">{ui.nav.requestQuote} <Icon name="arrow-right" /></a>
+    <a href={site.contact.phoneHref} class="btn btn--ghost-light"><Icon name="phone" /> {copy.callUs}</a>
+    <nav slot="meta" class="toc" aria-label={copy.tocLabel}>
+      <p class="toc__label">{getCategories(locale)[service.category].label}</p>
       <ol role="list">
         {
-          toc.map((t, i) => (
+          toc.map((item, i) => (
             <li>
-              <a href={`#${t.id}`}>
+              <a href={`#${item.id}`}>
                 <span>0{i + 1}</span>
-                {t.label}
+                {item.label}
               </a>
             </li>
           ))
@@ -74,11 +121,11 @@ const serviceSchema = {
   </PageHero>
 
   <!-- Overview -->
-  <section class="section overview" id="genel-bakis" aria-labelledby="overview-title">
+  <section class="section overview" id={copy.ids.overview} aria-labelledby="overview-title">
     <div class="container">
       <div class="overview__grid">
         <div class="overview__head" data-reveal>
-          <p class="eyebrow">Genel bakış</p>
+          <p class="eyebrow">{copy.sections.overview}</p>
           <h2 class="h2" id="overview-title">{service.intro.heading}</h2>
         </div>
         <div class="overview__body prose" data-reveal style="--reveal-delay:100">
@@ -108,11 +155,11 @@ const serviceSchema = {
   </section>
 
   <!-- Use cases -->
-  <section class="section surface-white" id="kullanim" aria-labelledby="usecases-title">
+  <section class="section surface-white" id={copy.ids.uses} aria-labelledby="usecases-title">
     <div class="container">
       <SectionHeader
         id="usecases-title"
-        eyebrow="Kimler · hangi durumlar"
+        eyebrow={copy.usesEyebrow}
         title={service.useCases.heading}
         lead={service.useCases.lead}
         layout="split"
@@ -132,10 +179,10 @@ const serviceSchema = {
   </section>
 
   <!-- Advantages -->
-  <section class="section surface-ink advantages" id="avantajlar" aria-labelledby="adv-title">
+  <section class="section surface-ink advantages" id={copy.ids.advantages} aria-labelledby="adv-title">
     <div class="container">
-      <SectionHeader id="adv-title" eyebrow="Avantajlar" title="Bu operasyonda" accent="farkı yaratan." layout="split">
-        <p class="lead">Her detay, operasyonun güvenli, zamanında ve öngörülebilir ilerlemesi için planlanır.</p>
+      <SectionHeader id="adv-title" eyebrow={copy.sections.advantages} title={copy.advTitle} accent={copy.advAccent} layout="split">
+        <p class="lead">{copy.advLead}</p>
       </SectionHeader>
       <ol class="adv" role="list">
         {
@@ -152,14 +199,14 @@ const serviceSchema = {
   </section>
 
   <!-- Process -->
-  <section class="section" id="surec" aria-labelledby="process-title">
+  <section class="section" id={copy.ids.process} aria-labelledby="process-title">
     <div class="container">
       <SectionHeader
         id="process-title"
-        eyebrow="Operasyon süreci"
-        title="Adım adım,"
-        accent="şeffaf bir plan."
-        lead="Talebinizi aldığımız andan teslimata kadar her aşamada neyin, ne zaman yapılacağını bilirsiniz."
+        eyebrow={copy.sections.process}
+        title={copy.processTitle}
+        accent={copy.processAccent}
+        lead={copy.processLead}
         layout="split"
       />
       <ProcessSteps steps={steps} />
@@ -167,17 +214,15 @@ const serviceSchema = {
   </section>
 
   <!-- Capabilities -->
-  <section class="section surface-paper-2" id="kabiliyetler" aria-labelledby="cap-title">
+  <section class="section surface-paper-2" id={copy.ids.capabilities} aria-labelledby="cap-title">
     <div class="container cap">
       <div class="cap__head" data-reveal>
-        <p class="eyebrow">Operasyonel kabiliyetler</p>
-        <h2 class="h2" id="cap-title">Kapsamımızda <em>neler var?</em></h2>
-        <p class="lead">
-          Her operasyon, ihtiyaca göre aşağıdaki bileşenlerin bir araya getirilmesiyle planlanır.
-        </p>
+        <p class="eyebrow">{copy.capEyebrow}</p>
+        <h2 class="h2" id="cap-title">{copy.capTitle} <em>{copy.capAccent}</em></h2>
+        <p class="lead">{copy.capLead}</p>
         <div class="btn-row">
-          <a href={quoteHref} class="btn">Teklif Al <Icon name="arrow-right" /></a>
-          <a href={withBase('/iletisim')} class="btn btn--ghost">Bizimle İletişime Geçin</a>
+          <a href={quoteHref} class="btn">{ui.nav.requestQuote} <Icon name="arrow-right" /></a>
+          <a href={pathTo(locale, 'contact')} class="btn btn--ghost">{ui.cta.contactUs}</a>
         </div>
       </div>
       <ul class="check-list cap__list" role="list" data-reveal style="--reveal-delay:120">
@@ -189,8 +234,8 @@ const serviceSchema = {
   <!-- Related -->
   <section class="section" aria-labelledby="related-title">
     <div class="container">
-      <SectionHeader id="related-title" eyebrow="İlgili çözümler" title="Bunlar da" accent="ilginizi çekebilir." layout="split">
-        <a href={withBase('/hizmetler')} class="link-arrow">Tüm hizmetler <Icon name="arrow-right" /></a>
+      <SectionHeader id="related-title" eyebrow={copy.relatedEyebrow} title={copy.relatedTitle} accent={copy.relatedAccent} layout="split">
+        <a href={pathTo(locale, 'services')} class="link-arrow">{ui.nav.allServices} <Icon name="arrow-right" /></a>
       </SectionHeader>
       <div class="related">
         {related.map((s, i) => <ServiceCard service={s} index={i} />)}
@@ -200,8 +245,8 @@ const serviceSchema = {
 
   <CtaBand
     eyebrow={service.navTitle}
-    title="Bu operasyonu"
-    accent="birlikte planlayalım."
+    title={copy.ctaTitle}
+    accent={copy.ctaAccent}
     image={service.detailImage}
     primaryHref={quoteHref}
   />
@@ -263,11 +308,11 @@ const serviceSchema = {
 
   .overview__head .h2 {
     margin-top: 1.25rem;
-    max-width: 16ch;
+    max-width: 20ch;
   }
 
   .overview__p {
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     line-height: 1.75;
   }
 
@@ -279,7 +324,7 @@ const serviceSchema = {
 
   .overview__quote p {
     font-family: var(--font-serif);
-    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.85rem);
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
     font-style: italic;
     font-weight: 300;
     line-height: 1.3;
@@ -383,7 +428,7 @@ const serviceSchema = {
   }
 
   .adv__title {
-    font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.7rem);
+    font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.4rem);
     line-height: 1.15;
   }
 

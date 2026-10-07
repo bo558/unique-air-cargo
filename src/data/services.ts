@@ -1,27 +1,36 @@
-import { withBase } from '@/utils/paths';
+import type { Locale } from '@/i18n/config';
+import { servicePath } from '@/i18n/config';
+import { serviceSlugs } from './service-slugs';
+import { servicesEn, categoriesEn, defaultProcessEn } from './services.en';
 import type { ImageMetadata } from 'astro';
 
-import imgMainDeck from '@/assets/images/main-deck-loading.jpg';
-import imgFreighterLoading from '@/assets/images/freighter-loading.jpg';
-import imgAn124Apron from '@/assets/images/an124-apron.jpg';
-import imgAn124Landing from '@/assets/images/an124-landing.jpg';
-import imgCargoRain from '@/assets/images/cargo-rain.jpg';
-import imgUldApron from '@/assets/images/uld-apron.jpg';
-import imgRunwayLights from '@/assets/images/runway-lights.jpg';
-import imgEngine from '@/assets/images/engine.jpg';
 import imgRacehorses from '@/assets/images/racehorses.jpg';
-import imgCargoStairs from '@/assets/images/cargo-stairs.jpg';
 import imgGulfstreamDusk from '@/assets/images/gulfstream-dusk.jpg';
 import imgJetInterior from '@/assets/images/jet-interior.jpg';
 import imgApronDusk from '@/assets/images/apron-dusk.jpg';
-import imgFalconStairs from '@/assets/images/falcon-stairs.jpg';
 import imgMedicalCabin from '@/assets/images/medical-cabin.jpg';
 import imgNightApproach from '@/assets/images/night-approach.jpg';
-import imgC130 from '@/assets/images/c130-runway.jpg';
 import imgA400m from '@/assets/images/a400m-sky.jpg';
-import imgPalletsApron from '@/assets/images/pallets-apron.jpg';
 import imgStage from '@/assets/images/stage.jpg';
-import imgTakeoffLights from '@/assets/images/takeoff-lights.jpg';
+import { projectImage } from './projects';
+
+// Real Unique Air Cargo operation photos (from the brand archive) wherever one fits the service
+const uac = {
+  freighterSunset: projectImage('oruc-reis-spare-parts', 1),
+  nightLoading: projectImage('hong-kong-riyadh', 4),
+  bridgeLift: projectImage('hong-kong-riyadh', 1),
+  moduleLift: projectImage('afghanistan-prefabricated-hospital', 1),
+  moduleCrane: projectImage('afghanistan-prefabricated-hospital', 2),
+  moduleHold: projectImage('afghanistan-prefabricated-hospital', 5),
+  dgBanner: projectImage('istanbul-ndjamena-dangerous-goods', 1),
+  dgContainer: projectImage('ankara-niamey-dangerous-goods', 1),
+  engine: projectImage('london-istanbul-aircraft-engine', 2),
+  forkliftLoading: projectImage('ataturk-airport-last-flight', 4),
+  il76Sunset: projectImage('ataturk-airport-last-flight', 1),
+  il76Dusk: projectImage('ataturk-airport-last-flight', 2),
+  a321: projectImage('istanbul-sudan-military-supplies', 1),
+  noseDoor: projectImage('istanbul-niamey-gold-exploration', 2),
+};
 
 export type CategoryId = 'kargo' | 'yolcu' | 'kurum';
 
@@ -56,7 +65,7 @@ export interface Service {
   related: string[];
 }
 
-export const categories: Record<CategoryId, { label: string; description: string }> = {
+const categoriesTr: Record<CategoryId, { label: string; description: string }> = {
   kargo: {
     label: 'Kargo & Özel Yük',
     description: 'Tarifeli kapasitenin yetmediği, özel elleçleme ve izin gerektiren yükler.',
@@ -71,7 +80,7 @@ export const categories: Record<CategoryId, { label: string; description: string
   },
 };
 
-export const defaultProcess: Step[] = [
+const defaultProcessTr: Step[] = [
   { title: 'Talep', text: 'Rota, tarih ve yük ya da yolcu bilgilerini bizimle paylaşırsınız.' },
   { title: 'Planlama', text: 'Uygun uçak tipi, rota ve zamanlama seçenekleri değerlendirilir.' },
   { title: 'Teklif', text: 'Seçenekler, piyasa koşullarına uygun ve şeffaf bir teklifle sunulur.' },
@@ -79,7 +88,7 @@ export const defaultProcess: Step[] = [
   { title: 'Operasyon', text: 'Uçuş ve teslimat, tek bir muhatap üzerinden uçtan uca takip edilir.' },
 ];
 
-export const services: Service[] = [
+const servicesTr: Service[] = [
   /* ------------------------------------------------------------------ KARGO */
   {
     slug: 'kargo-charter',
@@ -87,10 +96,10 @@ export const services: Service[] = [
     navTitle: 'Kargo Charter',
     category: 'kargo',
     summary: 'Tarifeli kapasitenin yetmediği hacim, tarih ya da rota için tam uçak kiralama.',
-    image: imgMainDeck,
-    imageAlt: 'Ana güverte kargo kapısından paletli yük yüklenen kargo uçağı',
-    detailImage: imgFreighterLoading,
-    detailImageAlt: 'Apronda yer ekibi tarafından yüklenen geniş gövdeli kargo uçağı',
+    image: uac.freighterSunset,
+    imageAlt: 'Gün batımında apronda bekleyen kargo uçağı',
+    detailImage: uac.nightLoading,
+    detailImageAlt: 'Gece yüklenen geniş gövdeli kargo uçağı',
     seo: {
       title: 'Kargo Charter Uçuşları',
       description:
@@ -142,10 +151,10 @@ export const services: Service[] = [
     navTitle: 'Ağır & Büyük Hacimli Yük',
     category: 'kargo',
     summary: 'Ölçüsü ve ağırlığıyla tarifeli uçuşlara sığmayan, yüke özel çözüm gerektiren sevkiyatlar.',
-    image: imgAn124Apron,
-    imageAlt: 'Islak apronda bekleyen Antonov An-124 ağır nakliye uçağı',
-    detailImage: imgAn124Landing,
-    detailImageAlt: 'İnişe yaklaşan dört motorlu ağır nakliye uçağı',
+    image: uac.bridgeLift,
+    imageAlt: 'Hong Kong Uluslararası Havalimanı’nda köprü bileşenlerini kaldıran vinç',
+    detailImage: uac.moduleLift,
+    detailImageAlt: 'Ağır nakliye uçağına prefabrik modül yükleyen vinç',
     seo: {
       title: 'Ağır ve Büyük Hacimli Yük Charter',
       description:
@@ -206,10 +215,10 @@ export const services: Service[] = [
     navTitle: 'Tehlikeli Madde',
     category: 'kargo',
     summary: 'IATA Tehlikeli Madde Regülasyonları konusunda eğitimli ekiple, planlamadan teslimata.',
-    image: imgCargoRain,
-    imageAlt: 'Yağmurlu havada apronda yüklenen kargo uçağı',
-    detailImage: imgUldApron,
-    detailImageAlt: 'Apronda uçağa yüklenmeyi bekleyen kargo konteynerleri',
+    image: uac.dgBanner,
+    imageAlt: 'Apronda Unique Air Cargo pankartının önünde tehlikeli madde sevkiyatı',
+    detailImage: uac.dgContainer,
+    detailImageAlt: 'Konteynerde etiketli tehlikeli madde paketleri',
     seo: {
       title: 'Tehlikeli Madde (DG) Charter Uçuşları',
       description:
@@ -267,10 +276,10 @@ export const services: Service[] = [
     navTitle: 'Acil & Kritik Zamanlı',
     category: 'kargo',
     summary: 'Üretim hattı durduğunda ya da hizmet kesildiğinde: zamanın en değerli kalem olduğu sevkiyatlar.',
-    image: imgRunwayLights,
-    imageAlt: 'Alacakaranlıkta pist ışıkları üzerinden inişe geçen uçak',
-    detailImage: imgEngine,
-    detailImageAlt: 'Apronda bir jet motorunun yakın plan görüntüsü',
+    image: uac.engine,
+    imageAlt: 'Kargo uçağının yanında taşıma kızağındaki uçak motoru',
+    detailImage: uac.forkliftLoading,
+    detailImageAlt: 'Kargo ambarına yük yükleyen forklift',
     seo: {
       title: 'Acil ve Kritik Zamanlı Charter Uçuşları',
       description:
@@ -325,8 +334,8 @@ export const services: Service[] = [
     summary: 'Yarış atlarından hayvanat bahçesi türlerine; her canlının ihtiyacına göre planlanan uçuşlar.',
     image: imgRacehorses,
     imageAlt: 'Yarış pistinde koşan safkan atlar',
-    detailImage: imgCargoStairs,
-    detailImageAlt: 'Apronda yükleme hazırlığı yapılan kargo uçağı',
+    detailImage: uac.il76Dusk,
+    detailImageAlt: 'Alacakaranlıkta apronda ağır nakliye uçağı',
     seo: {
       title: 'Canlı Hayvan Charter Uçuşları',
       description:
@@ -435,10 +444,10 @@ export const services: Service[] = [
     navTitle: 'Yolcu & Grup',
     category: 'yolcu',
     summary: 'Turizm grupları, kurumsal etkinlikler, spor takımları ve saha personeli için grup uçuşları.',
-    image: imgApronDusk,
-    imageAlt: 'Gün batımında körüğe yanaşmış yolcu uçağı ve apron araçları',
-    detailImage: imgFalconStairs,
-    detailImageAlt: 'Merdiveni açık, yolcu bekleyen jet uçağı',
+    image: uac.a321,
+    imageAlt: 'Apronda bekleyen yolcu uçağı',
+    detailImage: imgApronDusk,
+    detailImageAlt: 'Gün batımında körüğe yanaşmış yolcu uçağı ve apron araçları',
     seo: {
       title: 'Yolcu ve Grup Charter Uçuşları',
       description:
@@ -553,8 +562,8 @@ export const services: Service[] = [
     navTitle: 'Devlet & Askeri',
     category: 'kurum',
     summary: 'Kamu kurumları ve askeri kuruluşlar için kargo ve personel charter organizasyonu.',
-    image: imgC130,
-    imageAlt: 'Pistte ilerleyen dört motorlu askeri nakliye uçağı',
+    image: uac.il76Sunset,
+    imageAlt: 'Gün batımında apronda ağır nakliye uçağı',
     detailImage: imgA400m,
     detailImageAlt: 'Alttan görünen dört motorlu askeri nakliye uçağı',
     seo: {
@@ -608,10 +617,10 @@ export const services: Service[] = [
     navTitle: 'Yardım Malzemesi',
     category: 'kurum',
     summary: 'Afet bölgelerine ilaç, gıda, barınma ve enerji ekipmanının hızlı ve düzenli ulaştırılması.',
-    image: imgPalletsApron,
-    imageAlt: 'Apronda uçağa yüklenmeyi bekleyen paletlenmiş malzemeler',
-    detailImage: imgTakeoffLights,
-    detailImageAlt: 'Alacakaranlıkta iniş ışıkları yanan, kalkış yapan uçak',
+    image: uac.moduleCrane,
+    imageAlt: 'Prefabrik hastane modülünü kaldıran vinç',
+    detailImage: uac.moduleHold,
+    detailImageAlt: 'Kargo ambarında prefabrik modül',
     seo: {
       title: 'Yardım Malzemesi Charter Uçuşları',
       description:
@@ -666,8 +675,8 @@ export const services: Service[] = [
     summary: 'Turne ekipmanı, film seti malzemesi ve spor organizasyonları için takvime kilitli uçuşlar.',
     image: imgStage,
     imageAlt: 'Sis ve mavi ışıklar altında sahnede hazır bekleyen enstrümanlar',
-    detailImage: imgUldApron,
-    detailImageAlt: 'Apronda yüklenmeyi bekleyen kargo konteynerleri',
+    detailImage: uac.noseDoor,
+    detailImageAlt: 'Yükleme için burun kapağı açık kargo uçağı',
     seo: {
       title: 'Eğlence ve Spor Sektörü Charter Uçuşları',
       description:
@@ -714,12 +723,43 @@ export const services: Service[] = [
   },
 ];
 
-export const getService = (slug: string) => services.find((s) => s.slug === slug);
+/* ------------------------------------------------------------------ Localized access */
 
-export const servicesByCategory = (Object.keys(categories) as CategoryId[]).map((id) => ({
-  id,
-  ...categories[id],
-  services: services.filter((s) => s.category === id),
-}));
+/** Service id → English copy (images, category and relations are shared with the Turkish data). */
+const textEn = servicesEn;
 
-export const serviceHref = (slug: string) => withBase(`/hizmetler/${slug}`);
+export interface LocalizedService extends Service {
+  /** Stable id (original Turkish slug) used for relations, form values and routing */
+  id: string;
+  href: string;
+}
+
+const categoriesByLocale: Record<Locale, Record<CategoryId, { label: string; description: string }>> = {
+  tr: categoriesTr,
+  en: categoriesEn,
+};
+
+const processByLocale: Record<Locale, Step[]> = { tr: defaultProcessTr, en: defaultProcessEn };
+
+export const getCategories = (locale: Locale) => categoriesByLocale[locale];
+
+export const getDefaultProcess = (locale: Locale) => processByLocale[locale];
+
+export const getServices = (locale: Locale): LocalizedService[] =>
+  servicesTr.map((s) => {
+    const id = s.slug;
+    const localized = locale === 'tr' ? s : { ...s, ...textEn[id] };
+    return { ...localized, id, slug: serviceSlugs[id][locale], href: servicePath(locale, id) };
+  });
+
+export const getService = (locale: Locale, id: string) => getServices(locale).find((s) => s.id === id);
+
+export const getServicesByCategory = (locale: Locale) => {
+  const all = getServices(locale);
+  const cats = getCategories(locale);
+  return (Object.keys(cats) as CategoryId[]).map((id) => ({
+    id,
+    ...cats[id],
+    services: all.filter((s) => s.category === id),
+  }));
+};

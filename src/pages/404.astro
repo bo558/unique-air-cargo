@@ -1,31 +1,35 @@
 ---
-import { withBase } from '@/utils/paths';
 import { Picture } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
-import { servicesByCategory, serviceHref } from '@/data/services';
+import { getServices } from '@/data/services';
+import { pathTo } from '@/i18n/config';
 import image from '@/assets/images/contrail-ocean.jpg';
 
-const popular = servicesByCategory.flatMap((c) => c.services).slice(0, 4);
+// GitHub Pages serves a single 404 page for every locale: English first, with a Turkish way back.
+const popular = getServices('en').slice(0, 4);
 ---
 
-<BaseLayout title="Sayfa bulunamadı" description="Aradığınız sayfa bulunamadı." noindex>
+<BaseLayout title="Page not found" description="The page you are looking for could not be found." noindex>
   <section class="nf" aria-labelledby="nf-title">
     <div class="nf__media" aria-hidden="true">
       <Picture src={image} alt="" formats={['avif', 'webp']} widths={[960, 1600, 2400]} sizes="100vw" loading="eager" />
     </div>
     <div class="container nf__inner">
-      <p class="nf__code">404 · Rota bulunamadı</p>
-      <h1 class="display nf__title" id="nf-title">Bu rota <em>haritada yok.</em></h1>
+      <p class="nf__code">404 · Route not found</p>
+      <h1 class="display nf__title" id="nf-title">This route <em>isn’t on the map.</em></h1>
       <p class="nf__lead">
-        Aradığınız sayfa taşınmış ya da kaldırılmış olabilir. Ana sayfaya dönebilir veya hizmetlerimize göz atabilirsiniz.
+        The page you are looking for may have been moved or removed. Head back to the home page or explore our services.
       </p>
       <div class="btn-row">
-        <a href={withBase('/')} class="btn btn--light">Ana Sayfaya Dön <Icon name="arrow-right" /></a>
-        <a href={withBase('/hizmetler')} class="btn btn--ghost-light">Hizmetleri Keşfedin</a>
+        <a href={pathTo('en', 'home')} class="btn btn--light">Back to Home <Icon name="arrow-right" /></a>
+        <a href={pathTo('en', 'services')} class="btn btn--ghost-light">Explore Our Services</a>
       </div>
+      <p class="nf__alt" lang="tr">
+        Aradığınız sayfa bulunamadı. <a href={pathTo('tr', 'home')}>Türkçe ana sayfaya dönün</a>
+      </p>
       <ul class="nf__links" role="list">
-        {popular.map((s) => <li><a href={serviceHref(s.slug)}>{s.navTitle}</a></li>)}
+        {popular.map((s) => <li><a href={s.href}>{s.navTitle}</a></li>)}
       </ul>
     </div>
   </section>
@@ -90,6 +94,18 @@ const popular = servicesByCategory.flatMap((c) => c.services).slice(0, 4);
     margin-bottom: 2.5rem;
     font-size: var(--fs-lead);
     color: var(--text-inv-2);
+  }
+
+  .nf__alt {
+    margin-top: 1.75rem;
+    font-size: var(--fs-small);
+    color: var(--text-inv-2);
+  }
+
+  .nf__alt a {
+    color: var(--brand-300);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .nf__links {

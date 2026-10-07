@@ -1,0 +1,213 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { getServicesByCategory, getDefaultProcess, getServices, type CategoryId } from '@/data/services';
+import { pathTo, quoteHash, type Locale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+import { projectImage } from '@/data/projects';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const heroImage = projectImage('istanbul-niamey-gold-exploration', 1);
+const categories = getServicesByCategory(locale);
+
+const copy = {
+  en: {
+    title: 'Services',
+    description:
+      'Charter flight services for cargo, heavy and outsized freight, dangerous goods, time-critical shipments, live animals, VIP jets, passenger groups, air ambulance, government and military, humanitarian aid, and entertainment and sports.',
+    listName: 'Unique Air Cargo charter services',
+    eyebrow: 'Our services',
+    heroTitle: 'Charter solutions',
+    heroAccent: 'for every requirement.',
+    lead: 'Eleven areas of expertise for cargo, passenger and special operations. What they share: understanding the need, finding the right aircraft and managing the operation end to end.',
+    heroAlt: 'Boeing 747 freighter on the apron with airstairs in place',
+    explore: 'Explore Our Services',
+    navLabel: 'Service categories',
+    category: 'Category',
+    anchors: { kargo: 'cargo', yolcu: 'passenger', kurum: 'government' },
+    processEyebrow: 'How we work',
+    processTitle: 'From request to delivery,',
+    processAccent: 'one process.',
+    processLead:
+      'Whatever the service, every operation follows the same discipline: we understand the need, plan it, then manage it end to end.',
+  },
+  tr: {
+    title: 'Hizmetlerimiz',
+    description:
+      'Kargo, ağır ve büyük hacimli yük, tehlikeli madde, acil sevkiyat, canlı hayvan, VIP jet, yolcu ve grup, ambulans uçak, devlet ve askeri, yardım malzemesi ile eğlence ve spor sektörü için charter uçuş hizmetleri.',
+    listName: 'Unique Air Cargo charter hizmetleri',
+    eyebrow: 'Hizmetlerimiz',
+    heroTitle: 'Her ihtiyaca uygun',
+    heroAccent: 'charter çözümleri.',
+    lead: 'Kargo, yolcu ve özel operasyonlar için on bir uzmanlık alanı. Hepsinin ortak noktası: ihtiyacı doğru anlamak, doğru uçağı bulmak ve operasyonu uçtan uca yönetmek.',
+    heroAlt: 'Merdiveni yanaştırılmış Boeing 747 kargo uçağı apronda',
+    explore: 'Hizmetleri Keşfedin',
+    navLabel: 'Hizmet kategorileri',
+    category: 'Kategori',
+    anchors: { kargo: 'kargo', yolcu: 'yolcu', kurum: 'kurum' },
+    processEyebrow: 'Nasıl çalışıyoruz',
+    processTitle: 'Talepten teslimata,',
+    processAccent: 'tek bir süreç.',
+    processLead:
+      'Hangi hizmet olursa olsun, her operasyon aynı disiplinle ilerler: önce ihtiyacı anlarız, sonra planlarız, ardından uçtan uca yönetiriz.',
+  },
+}[locale];
+
+const anchor = (id: CategoryId) => copy.anchors[id];
+
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: copy.listName,
+  itemListElement: getServices(locale).map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: s.title,
+    url: new URL(s.href, Astro.site).href,
+  })),
+};
+---
+
+<BaseLayout title={copy.title} description={copy.description} image={heroImage} jsonLd={itemList}>
+  <PageHero
+    eyebrow={copy.eyebrow}
+    title={copy.heroTitle}
+    accent={copy.heroAccent}
+    lead={copy.lead}
+    image={heroImage}
+    imageAlt={copy.heroAlt}
+    crumbs={[{ label: copy.title }]}
+  >
+    <a href={pathTo(locale, 'contact', quoteHash[locale])} class="btn btn--light">{ui.nav.requestQuote} <Icon name="arrow-right" /></a>
+    <a href={`#${anchor('kargo')}`} class="btn btn--ghost-light">{copy.explore} <Icon name="arrow-down" /></a>
+  </PageHero>
+
+  <nav class="cat-nav" aria-label={copy.navLabel}>
+    <div class="container cat-nav__inner">
+      {
+        categories.map((cat, i) => (
+          <a href={`#${anchor(cat.id)}`}>
+            <span>0{i + 1}</span> {cat.label}
+          </a>
+        ))
+      }
+    </div>
+  </nav>
+
+  {
+    categories.map((cat, i) => (
+      <section class:list={['section', 'cat', i % 2 === 1 && 'surface-white']} id={anchor(cat.id)} aria-labelledby={`${cat.id}-title`}>
+        <div class="container">
+          <SectionHeader
+            id={`${cat.id}-title`}
+            eyebrow={`0${i + 1} — ${copy.category}`}
+            title={cat.label}
+            lead={cat.description}
+            layout="split"
+          />
+          <div class="cat__grid">
+            {cat.services.map((s, j) => (
+              <ServiceCard service={s} index={j} />
+            ))}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section surface-ink" aria-labelledby="process-title">
+    <div class="container">
+      <SectionHeader
+        id="process-title"
+        eyebrow={copy.processEyebrow}
+        title={copy.processTitle}
+        accent={copy.processAccent}
+        lead={copy.processLead}
+        layout="split"
+      />
+      <ProcessSteps steps={getDefaultProcess(locale)} />
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .cat-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(246, 244, 239, 0.94);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cat-nav__inner {
+    display: flex;
+    gap: 2.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cat-nav__inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cat-nav a {
+    flex: none;
+    padding: 1.15rem 0;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-2);
+    transition: color 0.25s;
+  }
+
+  .cat-nav a:hover {
+    color: var(--brand-600);
+  }
+
+  .cat-nav span {
+    margin-right: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--brand);
+  }
+
+  .cat {
+    scroll-margin-top: 3.5rem;
+  }
+
+  .cat__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3.5rem 2rem;
+  }
+
+  @media (max-width: 1023px) {
+    .cat__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 639px) {
+    .cat__grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .cat-nav__inner {
+      gap: 1.75rem;
+    }
+  }
+</style>

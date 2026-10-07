@@ -1,15 +1,18 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import { services, categories, serviceHref, type Service } from '@/data/services';
+import { getServices, getCategories, type LocalizedService } from '@/data/services';
+import { getLocale } from '@/i18n/config';
 
 interface Props {
-  items?: Service[];
+  items?: LocalizedService[];
   /** Show the category tag on each row */
   showCategory?: boolean;
 }
 
-const { items = services, showCategory = true } = Astro.props;
+const locale = getLocale(Astro.url);
+const categories = getCategories(locale);
+const { items = getServices(locale), showCategory = true } = Astro.props;
 ---
 
 <div class="sx" data-service-index>
@@ -17,7 +20,7 @@ const { items = services, showCategory = true } = Astro.props;
     {
       items.map((s, i) => (
         <li class="sx__item" data-reveal style={`--reveal-delay:${Math.min(i, 6) * 50}`}>
-          <a href={serviceHref(s.slug)} class="sx__row" data-index={i} data-active={i === 0 ? 'true' : undefined}>
+          <a href={s.href} class="sx__row" data-index={i} data-active={i === 0 ? 'true' : undefined}>
             <span class="sx__num">{String(i + 1).padStart(2, '0')}</span>
             <span class="sx__thumb" aria-hidden="true">
               <Image src={s.image} alt="" widths={[160, 240]} sizes="80px" loading="lazy" />
@@ -80,7 +83,7 @@ const { items = services, showCategory = true } = Astro.props;
     grid-template-columns: 3rem minmax(0, 1fr) auto 2rem;
     align-items: center;
     gap: 1.25rem;
-    padding: 1.6rem 0;
+    padding: 1.35rem 0;
     transition: padding 0.5s var(--ease-out);
   }
 
@@ -115,7 +118,7 @@ const { items = services, showCategory = true } = Astro.props;
 
   .sx__title {
     font-family: var(--font-serif);
-    font-size: clamp(1.35rem, 1.1rem + 0.9vw, 2rem);
+    font-size: clamp(1.2rem, 1.05rem + 0.55vw, 1.6rem);
     line-height: 1.15;
     letter-spacing: -0.02em;
     transition: color 0.3s;

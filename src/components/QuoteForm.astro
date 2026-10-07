@@ -1,33 +1,47 @@
 ---
-import { withBase } from '@/utils/paths';
 import Icon from './Icon.astro';
-import { servicesByCategory } from '@/data/services';
+import { getServicesByCategory } from '@/data/services';
 import { site } from '@/data/site';
+import { getLocale, pathTo } from '@/i18n/config';
+import { t } from '@/i18n/ui';
 
+const locale = getLocale(Astro.url);
+const ui = t(locale);
+const f = ui.form;
+const categories = getServicesByCategory(locale);
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+// Copy the client script needs (validation messages, email draft labels, status texts)
+const clientCopy = JSON.stringify({
+  messages: f.messages,
+  mail: f.mail,
+  successMailto: f.successMailto,
+  error: f.error,
+  submit: f.submit,
+  sending: f.sending,
+});
 ---
 
-<div class="qf" data-quote-form data-endpoint={endpoint} data-email={site.contact.email}>
+<div class="qf" data-quote-form data-endpoint={endpoint} data-email={site.contact.email} data-copy={clientCopy}>
   <form class="qf__form" novalidate>
     <fieldset class="qf__set">
-      <legend class="qf__legend"><span>01</span> Operasyon bilgileri</legend>
+      <legend class="qf__legend"><span>01</span> {f.section1}</legend>
 
       <div class="qf__grid">
         <div class="field field--full">
-          <label for="qf-service">Hizmet türü <span class="req" aria-hidden="true">*</span></label>
+          <label for="qf-service">{f.service} <span class="req" aria-hidden="true">*</span></label>
           <div class="select">
-            <select id="qf-service" name="hizmet" required aria-describedby="qf-service-err">
-              <option value="">Seçiniz</option>
+            <select id="qf-service" name="service" required aria-describedby="qf-service-err">
+              <option value="">{f.select}</option>
               {
-                servicesByCategory.map((cat) => (
+                categories.map((cat) => (
                   <optgroup label={cat.label}>
                     {cat.services.map((s) => (
-                      <option value={s.slug}>{s.title}</option>
+                      <option value={s.id}>{s.title}</option>
                     ))}
                   </optgroup>
                 ))
               }
-              <option value="diger">Diğer / Emin değilim</option>
+              <option value="other">{f.other}</option>
             </select>
             <Icon name="chevron-down" size={16} />
           </div>
@@ -35,99 +49,97 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
         </div>
 
         <div class="field">
-          <label for="qf-from">Kalkış noktası <span class="req" aria-hidden="true">*</span></label>
-          <input id="qf-from" name="kalkis" type="text" required autocomplete="off" placeholder="Şehir veya havalimanı" aria-describedby="qf-from-err" />
+          <label for="qf-from">{f.from} <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-from" name="from" type="text" required autocomplete="off" placeholder={f.placeholderPlace} aria-describedby="qf-from-err" />
           <p class="field__error" id="qf-from-err" aria-live="polite"></p>
         </div>
 
         <div class="field">
-          <label for="qf-to">Varış noktası <span class="req" aria-hidden="true">*</span></label>
-          <input id="qf-to" name="varis" type="text" required autocomplete="off" placeholder="Şehir veya havalimanı" aria-describedby="qf-to-err" />
+          <label for="qf-to">{f.to} <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-to" name="to" type="text" required autocomplete="off" placeholder={f.placeholderPlace} aria-describedby="qf-to-err" />
           <p class="field__error" id="qf-to-err" aria-live="polite"></p>
         </div>
 
         <div class="field">
-          <label for="qf-date">Planlanan tarih</label>
-          <input id="qf-date" name="tarih" type="date" />
+          <label for="qf-date">{f.date}</label>
+          <input id="qf-date" name="date" type="date" lang={locale} />
         </div>
 
         <div class="field field--check-inline">
           <label class="check">
-            <input type="checkbox" name="esnek" value="evet" />
+            <input type="checkbox" name="flexible" value="yes" />
             <span class="check__box" aria-hidden="true"><Icon name="check" size={14} /></span>
-            <span>Tarih esnek</span>
+            <span>{f.flexible}</span>
           </label>
         </div>
 
         <div class="field field--full">
-          <label for="qf-details">Yük veya yolcu detayları <span class="req" aria-hidden="true">*</span></label>
+          <label for="qf-details">{f.details} <span class="req" aria-hidden="true">*</span></label>
           <textarea
             id="qf-details"
-            name="detay"
+            name="details"
             rows="5"
             required
             minlength="10"
             aria-describedby="qf-details-hint qf-details-err"></textarea>
-          <p class="field__hint" id="qf-details-hint">
-            Yük için ölçü, ağırlık ve türü; yolcu uçuşları için kişi sayısı ve özel talepleriniz.
-          </p>
+          <p class="field__hint" id="qf-details-hint">{f.detailsHint}</p>
           <p class="field__error" id="qf-details-err" aria-live="polite"></p>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="qf__set">
-      <legend class="qf__legend"><span>02</span> İletişim bilgileri</legend>
+      <legend class="qf__legend"><span>02</span> {f.section2}</legend>
 
       <div class="qf__grid">
         <div class="field">
-          <label for="qf-name">Ad soyad <span class="req" aria-hidden="true">*</span></label>
-          <input id="qf-name" name="ad" type="text" required autocomplete="name" aria-describedby="qf-name-err" />
+          <label for="qf-name">{f.name} <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-name" name="name" type="text" required autocomplete="name" aria-describedby="qf-name-err" />
           <p class="field__error" id="qf-name-err" aria-live="polite"></p>
         </div>
 
         <div class="field">
-          <label for="qf-company">Şirket / kurum</label>
-          <input id="qf-company" name="sirket" type="text" autocomplete="organization" />
+          <label for="qf-company">{f.company}</label>
+          <input id="qf-company" name="company" type="text" autocomplete="organization" />
         </div>
 
         <div class="field">
-          <label for="qf-email">E-posta <span class="req" aria-hidden="true">*</span></label>
-          <input id="qf-email" name="eposta" type="email" required autocomplete="email" inputmode="email" aria-describedby="qf-email-err" />
+          <label for="qf-email">{f.email} <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-email" name="email" type="email" required autocomplete="email" inputmode="email" aria-describedby="qf-email-err" />
           <p class="field__error" id="qf-email-err" aria-live="polite"></p>
         </div>
 
         <div class="field">
-          <label for="qf-phone">Telefon <span class="req" aria-hidden="true">*</span></label>
-          <input id="qf-phone" name="telefon" type="tel" required autocomplete="tel" inputmode="tel" placeholder="+90" aria-describedby="qf-phone-err" />
+          <label for="qf-phone">{f.phone} <span class="req" aria-hidden="true">*</span></label>
+          <input id="qf-phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel" placeholder="+90" aria-describedby="qf-phone-err" />
           <p class="field__error" id="qf-phone-err" aria-live="polite"></p>
         </div>
 
         <div class="field field--hp" aria-hidden="true">
-          <label for="qf-website">Web sitesi</label>
+          <label for="qf-website">{f.website}</label>
           <input id="qf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
         </div>
 
         <div class="field field--full">
           <label class="check">
-            <input type="checkbox" name="kvkk" value="onay" required aria-describedby="qf-kvkk-err" />
+            <input type="checkbox" name="consent" value="yes" required aria-describedby="qf-consent-err" />
             <span class="check__box" aria-hidden="true"><Icon name="check" size={14} /></span>
             <span>
-              Kişisel verilerimin <a href={withBase('/kvkk')} target="_blank">KVKK Aydınlatma Metni</a> kapsamında, talebimin
-              yanıtlanması amacıyla işlenmesini kabul ediyorum. <span class="req" aria-hidden="true">*</span>
+              {f.consentBefore} <a href={pathTo(locale, 'privacy')} target="_blank">{f.consentLink}</a>
+              {f.consentAfter} <span class="req" aria-hidden="true">*</span>
             </span>
           </label>
-          <p class="field__error" id="qf-kvkk-err" aria-live="polite"></p>
+          <p class="field__error" id="qf-consent-err" aria-live="polite"></p>
         </div>
       </div>
     </fieldset>
 
     <div class="qf__submit">
       <button type="submit" class="btn qf__btn">
-        <span class="qf__btn-label">Teklif Talebini Gönder</span>
+        <span class="qf__btn-label">{f.submit}</span>
         <Icon name="arrow-right" />
       </button>
-      <p class="qf__note"><span class="req">*</span> Zorunlu alanlar</p>
+      <p class="qf__note"><span class="req">*</span> {f.required}</p>
     </div>
 
     <p class="qf__status" role="alert" aria-live="assertive" hidden></p>
@@ -135,14 +147,11 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 
   <div class="qf__success" tabindex="-1" hidden>
     <span class="qf__success-icon" aria-hidden="true"><Icon name="check" size={26} /></span>
-    <h3 class="qf__success-title">Talebiniz alındı.</h3>
-    <p class="qf__success-text" data-success-text>
-      Ekibimiz bilgilerinizi inceleyerek en kısa sürede sizinle iletişime geçecek. Acil durumlar için bizi doğrudan
-      arayabilirsiniz.
-    </p>
+    <h3 class="qf__success-title">{f.successTitle}</h3>
+    <p class="qf__success-text" data-success-text>{f.successText}</p>
     <div class="btn-row">
       <a href={site.contact.phoneHref} class="btn btn--ink"><Icon name="phone" /> {site.contact.phone}</a>
-      <button type="button" class="btn btn--ghost" data-reset>Yeni talep oluştur</button>
+      <button type="button" class="btn btn--ghost" data-reset>{f.newRequest}</button>
     </div>
   </div>
 </div>
@@ -441,30 +450,20 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 </style>
 
 <script>
-  type Rule = (el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) => string;
+  type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-  const messages: Record<string, Rule> = {
-    hizmet: (el) => (el.value ? '' : 'Lütfen bir hizmet türü seçin.'),
-    kalkis: (el) => (el.value.trim().length >= 2 ? '' : 'Lütfen kalkış noktasını yazın.'),
-    varis: (el) => (el.value.trim().length >= 2 ? '' : 'Lütfen varış noktasını yazın.'),
-    detay: (el) =>
-      el.value.trim().length >= 10 ? '' : 'Lütfen yük veya yolcu detaylarını kısaca açıklayın (en az 10 karakter).',
-    ad: (el) => (el.value.trim().length >= 3 ? '' : 'Lütfen adınızı ve soyadınızı yazın.'),
-    eposta: (el) =>
-      !el.value.trim()
-        ? 'Lütfen e-posta adresinizi yazın.'
-        : /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim())
-          ? ''
-          : 'Lütfen geçerli bir e-posta adresi yazın.',
-    telefon: (el) => {
-      const digits = el.value.replace(/\D/g, '');
-      if (!digits) return 'Lütfen telefon numaranızı yazın.';
-      return digits.length >= 10 && digits.length <= 15 ? '' : 'Lütfen geçerli bir telefon numarası yazın.';
-    },
-    kvkk: (el) => ((el as HTMLInputElement).checked ? '' : 'Devam etmek için KVKK onayı gereklidir.'),
-  };
+  interface Copy {
+    messages: Record<string, string>;
+    mail: Record<string, string>;
+    successMailto: string;
+    error: string;
+    submit: string;
+    sending: string;
+  }
 
   document.querySelectorAll<HTMLElement>('[data-quote-form]').forEach((root) => {
+    const copy: Copy = JSON.parse(root.dataset.copy ?? '{}');
+    const m = copy.messages;
     const form = root.querySelector('form')!;
     const success = root.querySelector<HTMLElement>('.qf__success')!;
     const successText = root.querySelector<HTMLElement>('[data-success-text]')!;
@@ -475,30 +474,50 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
     const email = root.dataset.email!;
     const defaultSuccess = successText.textContent;
 
-    // Preselect service from ?hizmet=slug
-    const select = form.elements.namedItem('hizmet') as HTMLSelectElement;
-    const preset = new URLSearchParams(window.location.search).get('hizmet');
+    const rules: Record<string, (el: Field) => string> = {
+      service: (el) => (el.value ? '' : m.service),
+      from: (el) => (el.value.trim().length >= 2 ? '' : m.from),
+      to: (el) => (el.value.trim().length >= 2 ? '' : m.to),
+      details: (el) => (el.value.trim().length >= 10 ? '' : m.details),
+      name: (el) => (el.value.trim().length >= 3 ? '' : m.name),
+      email: (el) =>
+        !el.value.trim() ? m.emailEmpty : /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(el.value.trim()) ? '' : m.emailInvalid,
+      phone: (el) => {
+        const digits = el.value.replace(/\D/g, '');
+        if (!digits) return m.phoneEmpty;
+        return digits.length >= 10 && digits.length <= 15 ? '' : m.phoneInvalid;
+      },
+      consent: (el) => ((el as HTMLInputElement).checked ? '' : m.consent),
+    };
+
+    const field = (name: string) => form.elements.namedItem(name) as Field;
+
+    // Preselect a service from ?service=<id> (links from service pages)
+    const select = field('service') as HTMLSelectElement;
+    const preset = new URLSearchParams(window.location.search).get('service');
     if (preset && Array.from(select.options).some((o) => o.value === preset)) select.value = preset;
 
-    const date = form.elements.namedItem('tarih') as HTMLInputElement;
-    date.min = new Date().toISOString().slice(0, 10);
-
-    const fieldEl = (name: string) =>
-      form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    (field('date') as HTMLInputElement).min = new Date().toISOString().slice(0, 10);
 
     const validate = (name: string) => {
-      const el = fieldEl(name);
-      const msg = messages[name](el);
-      const err = root.querySelector<HTMLElement>(`#${el.getAttribute('aria-describedby')?.split(' ').pop()}`);
+      const el = field(name);
+      const msg = rules[name](el);
+      const errId = el.getAttribute('aria-describedby')?.split(' ').pop();
+      const err = errId ? root.querySelector<HTMLElement>(`#${errId}`) : null;
       el.setAttribute('aria-invalid', String(Boolean(msg)));
       if (err) err.textContent = msg;
       return !msg;
     };
 
-    Object.keys(messages).forEach((name) => {
-      const el = fieldEl(name);
+    Object.keys(rules).forEach((name) => {
+      const el = field(name);
       const evt = el instanceof HTMLInputElement && el.type === 'checkbox' ? 'change' : 'blur';
-      el.addEventListener(evt, () => validate(name));
+      el.addEventListener(evt, (e) => {
+        // Moving straight to the submit button: let the submit handler validate everything.
+        // Showing an error here would shift the layout and make the click miss the button.
+        if (e instanceof FocusEvent && e.relatedTarget === submit) return;
+        validate(name);
+      });
       el.addEventListener('input', () => {
         if (el.getAttribute('aria-invalid') === 'true') validate(name);
       });
@@ -506,20 +525,20 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
 
     const payload = () => {
       const data = new FormData(form);
-      const serviceLabel = select.selectedOptions[0]?.textContent?.trim() ?? '';
+      const value = (k: string) => String(data.get(k) ?? '').trim();
       return {
-        hizmet: serviceLabel,
-        kalkis: String(data.get('kalkis') ?? '').trim(),
-        varis: String(data.get('varis') ?? '').trim(),
-        tarih: String(data.get('tarih') ?? '') || 'Belirtilmedi',
-        esnek: data.get('esnek') ? 'Evet' : 'Hayır',
-        detay: String(data.get('detay') ?? '').trim(),
-        ad: String(data.get('ad') ?? '').trim(),
-        sirket: String(data.get('sirket') ?? '').trim() || '-',
-        eposta: String(data.get('eposta') ?? '').trim(),
-        telefon: String(data.get('telefon') ?? '').trim(),
-        kvkk: 'Onaylandı',
-        sayfa: window.location.href,
+        service: select.selectedOptions[0]?.textContent?.trim() ?? '',
+        from: value('from'),
+        to: value('to'),
+        date: value('date') || copy.mail.notSpecified,
+        flexible: data.get('flexible') ? copy.mail.yes : copy.mail.no,
+        details: value('details'),
+        name: value('name'),
+        company: value('company') || '-',
+        email: value('email'),
+        phone: value('phone'),
+        language: document.documentElement.lang,
+        page: window.location.href,
       };
     };
 
@@ -535,45 +554,44 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
       e.preventDefault();
       status.hidden = true;
 
-      const invalid = Object.keys(messages).filter((name) => !validate(name));
+      const invalid = Object.keys(rules).filter((name) => !validate(name));
       if (invalid.length) {
-        fieldEl(invalid[0]).focus();
+        field(invalid[0]).focus();
         return;
       }
 
       // Honeypot: silently accept bots without sending anything.
-      if ((fieldEl('website') as HTMLInputElement).value) {
+      if ((field('website') as HTMLInputElement).value) {
         showSuccess();
         return;
       }
 
       const data = payload();
+      const l = copy.mail;
 
       if (!endpoint) {
         const body = [
-          `Hizmet: ${data.hizmet}`,
-          `Kalkış: ${data.kalkis}`,
-          `Varış: ${data.varis}`,
-          `Tarih: ${data.tarih} (esnek: ${data.esnek})`,
+          `${l.service}: ${data.service}`,
+          `${l.from}: ${data.from}`,
+          `${l.to}: ${data.to}`,
+          `${l.date}: ${data.date} (${l.flexible}: ${data.flexible})`,
           '',
-          'Detaylar:',
-          data.detay,
+          `${l.details}:`,
+          data.details,
           '',
-          `Ad soyad: ${data.ad}`,
-          `Şirket: ${data.sirket}`,
-          `E-posta: ${data.eposta}`,
-          `Telefon: ${data.telefon}`,
+          `${l.name}: ${data.name}`,
+          `${l.company}: ${data.company}`,
+          `${l.email}: ${data.email}`,
+          `${l.phone}: ${data.phone}`,
         ].join('\n');
-        const subject = `Teklif talebi: ${data.hizmet} — ${data.kalkis} → ${data.varis}`;
+        const subject = `${l.subject}: ${data.service} — ${data.from} → ${data.to}`;
         window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        showSuccess(
-          'Talebiniz e-posta uygulamanızda hazırlandı. Göndermeyi tamamladığınızda ekibimiz en kısa sürede sizinle iletişime geçecek.',
-        );
+        showSuccess(copy.successMailto);
         return;
       }
 
       submit.disabled = true;
-      submitLabel.textContent = 'Gönderiliyor…';
+      submitLabel.textContent = copy.sending;
       try {
         const res = await fetch(endpoint, {
           method: 'POST',
@@ -584,11 +602,15 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
         form.reset();
         showSuccess();
       } catch {
-        status.innerHTML = `Talebiniz şu anda gönderilemedi. Lütfen tekrar deneyin ya da bize doğrudan <a href="mailto:${email}">${email}</a> adresinden ulaşın.`;
+        status.textContent = `${copy.error} `;
+        const link = document.createElement('a');
+        link.href = `mailto:${email}`;
+        link.textContent = email;
+        status.append(link);
         status.hidden = false;
       } finally {
         submit.disabled = false;
-        submitLabel.textContent = 'Teklif Talebini Gönder';
+        submitLabel.textContent = copy.submit;
       }
     });
 

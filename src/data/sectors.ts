@@ -1,11 +1,8 @@
+import type { Locale } from '@/i18n/config';
+import { sectorsEn } from './sectors.en';
 import type { ImageMetadata } from 'astro';
+import { projectImage } from './projects';
 
-import imgAn124Landing from '@/assets/images/an124-landing.jpg';
-import imgApronSunset from '@/assets/images/apron-sunset.jpg';
-import imgEngine from '@/assets/images/engine.jpg';
-import imgFreighterLoading from '@/assets/images/freighter-loading.jpg';
-import imgNightApproach from '@/assets/images/night-approach.jpg';
-import imgA400m from '@/assets/images/a400m-sky.jpg';
 import imgStage from '@/assets/images/stage.jpg';
 
 export interface Sector {
@@ -21,7 +18,16 @@ export interface Sector {
   context?: { label: string; text: string };
 }
 
-export const sectors: Sector[] = [
+const uac = {
+  energy: projectImage('oruc-reis-spare-parts', 2),
+  construction: projectImage('hong-kong-riyadh', 2),
+  aviation: projectImage('london-istanbul-aircraft-engine', 1),
+  manufacturing: projectImage('istanbul-niamey-gold-exploration', 3),
+  health: projectImage('liege-kigali-mri-equipment', 1),
+  government: projectImage('ataturk-airport-last-flight', 3),
+};
+
+const sectorsTr: Sector[] = [
   {
     id: 'enerji',
     title: 'Enerji, Petrol & Gaz',
@@ -34,8 +40,8 @@ export const sectors: Sector[] = [
       'Tehlikeli madde içeren saha ekipmanı',
     ],
     services: ['agir-yuk-charter', 'acil-kritik-zamanli-charter', 'yolcu-grup-charter', 'tehlikeli-madde-charter'],
-    image: imgAn124Landing,
-    imageAlt: 'İnişe yaklaşan ağır nakliye uçağı',
+    image: uac.energy,
+    imageAlt: 'Gün batımında çekici ile kargo uçağı',
   },
   {
     id: 'insaat-altyapi',
@@ -49,8 +55,8 @@ export const sectors: Sector[] = [
       'Şantiye kurulumu için toplu malzeme sevkiyatı',
     ],
     services: ['agir-yuk-charter', 'kargo-charter', 'yolcu-grup-charter', 'acil-kritik-zamanli-charter'],
-    image: imgApronSunset,
-    imageAlt: 'Gün batımında yük ve yer hizmeti araçlarıyla dolu apron',
+    image: uac.construction,
+    imageAlt: 'Hong Kong Havalimanı’nda köprü bileşenlerini yükleyen kamyon vinç',
     context: {
       label: 'Pazar bağlamı · Körfez',
       text: 'Suudi Arabistan başta olmak üzere Körfez ülkelerinde, Riyad gibi hızla büyüyen şehirlerde köprü, metro ve yol projelerine milyar dolarlık yatırımlar yapılıyor; Türk müteahhitler de bu projelerde önemli sözleşmeler üstleniyor. Bu ölçekteki projeler, sahaya zamanında ulaşması gereken ekipman, yedek parça ve personel için hızlı ve esnek hava taşımacılığı ihtiyacını beraberinde getiriyor.',
@@ -68,8 +74,8 @@ export const sectors: Sector[] = [
       'Bakım ekipmanı ve teknik ekipler',
     ],
     services: ['acil-kritik-zamanli-charter', 'agir-yuk-charter', 'kargo-charter'],
-    image: imgEngine,
-    imageAlt: 'Apronda turbofan jet motoru',
+    image: uac.aviation,
+    imageAlt: 'Ağır nakliye uçağına yüklenen uçak motoru',
   },
   {
     id: 'otomotiv-uretim',
@@ -83,8 +89,8 @@ export const sectors: Sector[] = [
       'Tesis kurulumları için toplu ekipman transferi',
     ],
     services: ['acil-kritik-zamanli-charter', 'agir-yuk-charter', 'kargo-charter'],
-    image: imgFreighterLoading,
-    imageAlt: 'Apronda yüklenen geniş gövdeli kargo uçağı',
+    image: uac.manufacturing,
+    imageAlt: 'Hava kargo için hazırlanmış endüstriyel tanklar',
   },
   {
     id: 'saglik',
@@ -98,8 +104,8 @@ export const sectors: Sector[] = [
       'Sağlık kuruluşları için acil tedarik',
     ],
     services: ['ambulans-ucak', 'acil-kritik-zamanli-charter', 'yardim-malzemesi-charter'],
-    image: imgNightApproach,
-    imageAlt: 'Gece inişe yaklaşan uçak',
+    image: uac.health,
+    imageAlt: 'Kargo ambarında sabitlenmiş tıbbi ekipman sandıkları',
   },
   {
     id: 'kamu-insani-yardim',
@@ -113,8 +119,8 @@ export const sectors: Sector[] = [
       'Diplomatik izin gerektiren sevkiyatlar',
     ],
     services: ['devlet-askeri-charter', 'yardim-malzemesi-charter', 'tehlikeli-madde-charter'],
-    image: imgA400m,
-    imageAlt: 'Alttan görünen askeri nakliye uçağı',
+    image: uac.government,
+    imageAlt: 'Apronda ağır nakliye uçağı',
   },
   {
     id: 'eglence-spor',
@@ -132,3 +138,6 @@ export const sectors: Sector[] = [
     imageAlt: 'Sahnede hazır bekleyen enstrümanlar',
   },
 ];
+
+export const getSectors = (locale: Locale): Sector[] =>
+  locale === 'tr' ? sectorsTr : sectorsTr.map((s) => ({ ...s, ...sectorsEn[s.id] }));

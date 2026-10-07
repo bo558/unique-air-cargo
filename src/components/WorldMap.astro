@@ -5,6 +5,10 @@
  * company states it has local representation.
  */
 import map from '@/data/world-map.json';
+import { getLocale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+
+const ui = t(getLocale(Astro.url));
 
 type Pt = [number, number];
 const { width, dots, points } = map as unknown as {
@@ -22,13 +26,13 @@ const top = Math.floor(Math.min(...ys) - 14);
 const viewH = Math.ceil(Math.max(...ys) + 14) - top;
 
 const regions: { key: string; label: string; at: Pt; anchor: 'start' | 'end' | 'middle'; dx: number; dy: number }[] = [
-  { key: 'europe', label: 'Avrupa', at: points.europe, anchor: 'end', dx: -10, dy: 18 },
-  { key: 'russia', label: 'Rusya', at: points.russia, anchor: 'start', dx: 10, dy: -10 },
-  { key: 'cis', label: 'BDT', at: points.cis, anchor: 'start', dx: 12, dy: 4 },
-  { key: 'middleEast', label: 'Orta Doğu', at: points.middleEast, anchor: 'start', dx: 12, dy: 10 },
-  { key: 'africa', label: 'Afrika', at: [(points.africa[0] + points.africaE[0]) / 2, points.africa[1] + 8], anchor: 'start', dx: 12, dy: 4 },
-  { key: 'farEast', label: 'Uzak Doğu', at: points.farEast, anchor: 'start', dx: 12, dy: 4 },
-  { key: 'usa', label: 'ABD', at: points.usa, anchor: 'end', dx: -12, dy: 4 },
+  { key: 'europe', label: ui.map.regions.europe, at: points.europe, anchor: 'end', dx: -10, dy: 18 },
+  { key: 'russia', label: ui.map.regions.russia, at: points.russia, anchor: 'start', dx: 10, dy: -10 },
+  { key: 'cis', label: ui.map.regions.cis, at: points.cis, anchor: 'start', dx: 12, dy: 4 },
+  { key: 'middleEast', label: ui.map.regions.middleEast, at: points.middleEast, anchor: 'start', dx: 12, dy: 10 },
+  { key: 'africa', label: ui.map.regions.africa, at: [(points.africa[0] + points.africaE[0]) / 2, points.africa[1] + 8], anchor: 'start', dx: 12, dy: 4 },
+  { key: 'farEast', label: ui.map.regions.farEast, at: points.farEast, anchor: 'start', dx: 12, dy: 4 },
+  { key: 'usa', label: ui.map.regions.usa, at: points.usa, anchor: 'end', dx: -12, dy: 4 },
 ];
 
 const arc = (from: Pt, to: Pt) => {
@@ -47,14 +51,21 @@ const dotPath = dots.map(([x, y]) => `M${x} ${y}h0`).join('');
 
 <figure class="wm" data-reveal="fade">
   <svg viewBox={`0 ${top} ${width} ${viewH}`} role="img" aria-labelledby="wm-title wm-desc" preserveAspectRatio="xMidYMid meet">
-    <title id="wm-title">Unique Air Cargo global temsil ağı</title>
-    <desc id="wm-desc">
-      İstanbul merkezinden Avrupa, Rusya, BDT ülkeleri, Orta Doğu, Afrika, Uzak Doğu ve ABD'deki yerel temsilcilere uzanan
-      bağlantılar.
-    </desc>
+    <title id="wm-title">{ui.map.title}</title>
+    <desc id="wm-desc">{ui.map.desc}</desc>
     <path d={dotPath} class="wm__land" />
     <g class="wm__arcs">
       {regions.map((r, i) => <path d={arc(hub, r.at)} pathLength="1" style={`--i:${i}`} />)}
+    </g>
+    <g class="wm__flights" aria-hidden="true">
+      {
+        regions.map((r, i) => (
+          <circle r="2.6" opacity="0">
+            <animateMotion dur="7s" repeatCount="indefinite" begin={`${(2.2 + i * 0.9).toFixed(1)}s`} path={arc(hub, r.at)} keyPoints="0;1;1" keyTimes="0;0.55;1" calcMode="spline" keySplines="0.45 0 0.55 1;0 0 1 1" />
+            <animate attributeName="opacity" dur="7s" repeatCount="indefinite" begin={`${(2.2 + i * 0.9).toFixed(1)}s`} values="0;1;1;0;0" keyTimes="0;0.06;0.5;0.58;1" />
+          </circle>
+        ))
+      }
     </g>
     <g class="wm__nodes">
       {
@@ -71,7 +82,7 @@ const dotPath = dots.map(([x, y]) => `M${x} ${y}h0`).join('');
     <g class="wm__hub">
       <circle cx={hub[0]} cy={hub[1]} r="14" class="wm__pulse" />
       <circle cx={hub[0]} cy={hub[1]} r="5" class="wm__core" />
-      <text x={hub[0] + 2} y={hub[1] + 26} text-anchor="middle">İSTANBUL</text>
+      <text x={hub[0] + 2} y={hub[1] + 26} text-anchor="middle">{ui.map.hub}</text>
     </g>
   </svg>
 </figure>
@@ -103,6 +114,10 @@ const dotPath = dots.map(([x, y]) => `M${x} ${y}h0`).join('');
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
     opacity: 0.9;
+  }
+
+  .wm__flights circle {
+    fill: var(--white);
   }
 
   .wm__node circle {
@@ -180,6 +195,9 @@ const dotPath = dots.map(([x, y]) => `M${x} ${y}h0`).join('');
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .wm__flights {
+      display: none;
+    }
     .wm__arcs path {
       stroke-dashoffset: 0;
     }

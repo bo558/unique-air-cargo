@@ -1,12 +1,18 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import { scenarios } from '@/data/scenarios';
-import { getService, serviceHref } from '@/data/services';
+import { getScenarios } from '@/data/scenarios';
+import { getService } from '@/data/services';
+import { getLocale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+
+const locale = getLocale(Astro.url);
+const ui = t(locale);
+const scenarios = getScenarios(locale);
 ---
 
 <div class="sc" data-tabs>
-  <div class="sc__tabs" role="tablist" aria-label="Operasyon senaryoları">
+  <div class="sc__tabs" role="tablist" aria-label={ui.scenario.tabsLabel}>
     {
       scenarios.map((s, i) => (
         <button
@@ -38,31 +44,31 @@ import { getService, serviceHref } from '@/data/services';
         >
           <div class="sc__media">
             <Image src={s.image} alt={s.imageAlt} widths={[560, 840, 1200]} sizes="(min-width: 1024px) 40vw, 92vw" loading="lazy" />
-            <span class="sc__badge">Temsili senaryo</span>
+            <span class="sc__badge">{ui.scenario.badge}</span>
           </div>
           <div class="sc__body">
             <p class="sc__sector">{s.sector}</p>
             <h3 class="sc__title">{s.title}</h3>
             <dl class="sc__dl">
               <div>
-                <dt>Durum</dt>
+                <dt>{ui.scenario.situation}</dt>
                 <dd>{s.situation}</dd>
               </div>
               <div>
-                <dt>İhtiyaç</dt>
+                <dt>{ui.scenario.need}</dt>
                 <dd>{s.need}</dd>
               </div>
               <div>
-                <dt>Yaklaşım</dt>
+                <dt>{ui.scenario.approach}</dt>
                 <dd>{s.approach}</dd>
               </div>
             </dl>
             <ul class="sc__links" role="list">
               {s.services.map((slug) => {
-                const svc = getService(slug);
+                const svc = getService(locale, slug);
                 return svc ? (
                   <li>
-                    <a href={serviceHref(slug)} class="link-arrow">
+                    <a href={svc.href} class="link-arrow">
                       {svc.navTitle} <Icon name="arrow-right" />
                     </a>
                   </li>
@@ -134,7 +140,7 @@ import { getService, serviceHref } from '@/data/services';
 
   .sc__tab-label {
     font-family: var(--font-serif);
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     letter-spacing: -0.015em;
     line-height: 1.2;
   }

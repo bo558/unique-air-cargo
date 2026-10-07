@@ -1,0 +1,217 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import RouteMap from '@/components/RouteMap.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { getProjects, projectImage } from '@/data/projects';
+import { pathTo, quoteHash, type Locale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const projects = getProjects(locale);
+const [featureA, featureB, ...rest] = projects;
+
+const heroImage = projectImage('oruc-reis-spare-parts', 1);
+const ctaImage = projectImage('ataturk-airport-last-flight', 1);
+
+// Counts derived from the project list itself — nothing estimated
+const places = new Set(projects.flatMap((p) => [p.from?.name, p.to?.name]).filter(Boolean));
+const routed = projects.filter((p) => p.from && p.to).length;
+
+const copy = {
+  en: {
+    title: 'Projects',
+    description:
+      'Selected Unique Air Cargo operations: project cargo, dangerous goods, aircraft engines, vehicles and medical equipment flown between Europe, the Middle East, Africa and Asia.',
+    eyebrow: 'Projects',
+    heroTitle: 'Operations,',
+    heroAccent: 'not promises.',
+    lead: 'A selection of charter operations from our own archive — photographed on the apron, in the hold and on the road to the aircraft.',
+    heroAlt: 'Freighter on the apron at sunset',
+    explore: 'View the projects',
+    stats: [
+      { value: String(projects.length), label: 'Projects in this selection' },
+      { value: String(routed), label: 'Point-to-point routes' },
+      { value: String(places.size), label: 'Cities and countries' },
+    ],
+    mapEyebrow: 'Route archive',
+    mapTitle: 'Where these',
+    mapAccent: 'operations flew.',
+    mapLead: 'Every line on this map is a route from a project below.',
+    gridEyebrow: 'Selected operations',
+    gridTitle: 'From the',
+    gridAccent: 'apron and the hold.',
+    ctaEyebrow: 'Your operation',
+    ctaTitle: 'The next project',
+    ctaAccent: 'could be yours.',
+  },
+  tr: {
+    title: 'Projeler',
+    description:
+      'Unique Air Cargo’dan seçilmiş operasyonlar: proje kargosu, tehlikeli madde, uçak motoru, araç ve tıbbi ekipman taşımaları; Avrupa, Orta Doğu, Afrika ve Asya arasında.',
+    eyebrow: 'Projeler',
+    heroTitle: 'Söz değil,',
+    heroAccent: 'operasyon.',
+    lead: 'Kendi arşivimizden seçilmiş charter operasyonları — apronda, kargo ambarında ve uçağa giden yolda çekilmiş fotoğraflarla.',
+    heroAlt: 'Gün batımında apronda bekleyen kargo uçağı',
+    explore: 'Projeleri inceleyin',
+    stats: [
+      { value: String(projects.length), label: 'Bu seçkideki proje' },
+      { value: String(routed), label: 'Noktadan noktaya rota' },
+      { value: String(places.size), label: 'Şehir ve ülke' },
+    ],
+    mapEyebrow: 'Rota arşivi',
+    mapTitle: 'Bu operasyonlar',
+    mapAccent: 'nereye uçtu?',
+    mapLead: 'Haritadaki her çizgi, aşağıdaki projelerden birinin rotasıdır.',
+    gridEyebrow: 'Seçilmiş operasyonlar',
+    gridTitle: 'Apron ve',
+    gridAccent: 'ambar kayıtlarından.',
+    ctaEyebrow: 'Sizin operasyonunuz',
+    ctaTitle: 'Sıradaki proje',
+    ctaAccent: 'sizinki olabilir.',
+  },
+}[locale];
+
+const anchor = locale === 'tr' ? 'projeler' : 'projects';
+---
+
+<BaseLayout title={copy.title} description={copy.description} image={heroImage}>
+  <PageHero
+    eyebrow={copy.eyebrow}
+    title={copy.heroTitle}
+    accent={copy.heroAccent}
+    lead={copy.lead}
+    image={heroImage}
+    imageAlt={copy.heroAlt}
+    crumbs={[{ label: copy.title }]}
+    position="center 60%"
+  >
+    <a href={`#${anchor}`} class="btn btn--light">{copy.explore} <Icon name="arrow-down" /></a>
+    <a href={pathTo(locale, 'contact', quoteHash[locale])} class="btn btn--ghost-light">{ui.nav.requestQuote}</a>
+  </PageHero>
+
+  <section class="section surface-ink pmap" aria-labelledby="pmap-title">
+    <div class="container">
+      <div class="pmap__head">
+        <SectionHeader id="pmap-title" eyebrow={copy.mapEyebrow} title={copy.mapTitle} accent={copy.mapAccent} lead={copy.mapLead} layout="split" />
+      </div>
+      <RouteMap title={ui.project.mapTitle} routes={projects.map((p) => ({ from: p.from, to: p.to, href: p.href, label: p.title }))} />
+      <dl class="pmap__stats">
+        {
+          copy.stats.map((s, i) => (
+            <div data-reveal style={`--reveal-delay:${i * 80}`}>
+              <dt>{s.label}</dt>
+              <dd>{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" id={anchor} aria-labelledby="grid-title">
+    <div class="container">
+      <SectionHeader id="grid-title" eyebrow={copy.gridEyebrow} title={copy.gridTitle} accent={copy.gridAccent} />
+      <div class="pgrid pgrid--feature">
+        <ProjectCard project={featureA} index={0} size="feature" />
+        <ProjectCard project={featureB} index={1} size="feature" />
+      </div>
+      <div class="pgrid">
+        {rest.map((p, i) => <ProjectCard project={p} index={i + 2} />)}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand eyebrow={copy.ctaEyebrow} title={copy.ctaTitle} accent={copy.ctaAccent} image={ctaImage} />
+</BaseLayout>
+
+<style>
+  .pmap {
+    overflow: hidden;
+  }
+
+  .pmap__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    border-top: 1px solid var(--line-inv-strong);
+  }
+
+  .pmap__stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    padding: 1.5rem 1.5rem 0;
+    border-left: 1px solid var(--line-inv);
+  }
+
+  .pmap__stats > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .pmap__stats dd {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 1.7rem + 1.2vw, 2.8rem);
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .pmap__stats dt {
+    font-size: var(--fs-small);
+    color: var(--text-inv-2);
+  }
+
+  .pgrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3rem 2rem;
+  }
+
+  .pgrid--feature {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 3.5rem;
+  }
+
+  @media (max-width: 1023px) {
+    .pgrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 639px) {
+    .pgrid,
+    .pgrid--feature {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .pgrid--feature {
+      margin-bottom: 2.5rem;
+    }
+
+    .pmap__stats {
+      grid-template-columns: 1fr;
+    }
+
+    .pmap__stats > div {
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--line-inv);
+    }
+  }
+</style>

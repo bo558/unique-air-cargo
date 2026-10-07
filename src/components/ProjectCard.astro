@@ -1,0 +1,156 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { LocalizedProject } from '@/data/projects';
+
+interface Props {
+  project: LocalizedProject;
+  index?: number;
+  size?: 'feature' | 'default';
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { project, index, size = 'default', headingLevel: Heading = 'h3' } = Astro.props;
+const num = index !== undefined ? String(index + 1).padStart(2, '0') : undefined;
+---
+
+<article class:list={['pc', `pc--${size}`]} data-reveal style={index !== undefined ? `--reveal-delay:${(index % 3) * 70}` : undefined}>
+  <a href={project.href} class="pc__link">
+    <div class="pc__media">
+      <Image
+        src={project.cover}
+        alt={project.title}
+        widths={size === 'feature' ? [640, 960, 1400] : [480, 720, 960]}
+        sizes={size === 'feature' ? '(min-width: 1100px) 640px, 92vw' : '(min-width: 1100px) 420px, (min-width: 700px) 46vw, 92vw'}
+        loading="lazy"
+      />
+      <div class="pc__shade" aria-hidden="true"></div>
+      {num && <span class="pc__num">{num}</span>}
+      <span class="pc__arrow" aria-hidden="true"><Icon name="arrow-up-right" size={18} /></span>
+    </div>
+    <div class="pc__body">
+      <p class="pc__meta">
+        <span>{project.tag}</span>
+        {project.route && <span class="pc__route">{project.route}</span>}
+      </p>
+      <Heading class="pc__title">{project.title}</Heading>
+    </div>
+  </a>
+</article>
+
+<style>
+  .pc__link {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .pc__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--ink-800);
+  }
+
+  .pc--feature .pc__media {
+    aspect-ratio: 16 / 10;
+  }
+
+  .pc__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+
+  .pc__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(5, 9, 15, 0.45), transparent 45%);
+    opacity: 0.7;
+    transition: opacity 0.5s var(--ease-out);
+  }
+
+  .pc__num {
+    position: absolute;
+    left: 1rem;
+    bottom: 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    color: var(--white);
+  }
+
+  .pc__arrow {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--ink-900);
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.5s var(--ease-out);
+  }
+
+  .pc__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brand-600);
+  }
+
+  .pc__route {
+    color: var(--text-3);
+  }
+
+  .pc__title {
+    margin-top: 0.45rem;
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+    transition: color 0.3s;
+  }
+
+  .pc--feature .pc__title {
+    font-size: var(--fs-h3);
+  }
+
+  .pc__link:hover .pc__media :global(img) {
+    transform: scale(1.04);
+  }
+
+  .pc__link:hover .pc__shade {
+    opacity: 1;
+  }
+
+  .pc__link:hover .pc__arrow,
+  .pc__link:focus-visible .pc__arrow {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pc__link:hover .pc__title {
+    color: var(--brand-600);
+  }
+
+  :global(.surface-ink) .pc__meta {
+    color: var(--brand-300);
+  }
+
+  :global(.surface-ink) .pc__route {
+    color: var(--text-inv-3);
+  }
+
+  :global(.surface-ink) .pc__link:hover .pc__title {
+    color: var(--brand-200);
+  }
+</style>

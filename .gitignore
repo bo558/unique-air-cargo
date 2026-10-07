@@ -21,3 +21,21 @@ desktop.ini
 
 # Internal design references from the client — not for a public repository
 ChatGPT*.png
+
+# Raw brand photo/video archive — the site only uses optimised copies in
+# src/assets/projects and public/media (see scripts / project data)
+Markadan gelen görseller/
+
+# Loose duplicate media uploaded to the project root. Leading "/" = root only,
+# so src/ and public/ assets are never affected.
+/*.jpg
+/*.JPG
+/*.jpeg
+/*.JPEG
+/*.heic
+/*.HEIC
+/*.mov
+/*.MOV
+/*.mp4
+/*.MP4
+/*.docx

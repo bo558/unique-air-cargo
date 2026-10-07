@@ -1,11 +1,14 @@
 ---
 import type { Step } from '@/data/services';
+import { getLocale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
 
 interface Props {
   steps: Step[];
 }
 
 const { steps } = Astro.props;
+const ui = t(getLocale(Astro.url));
 ---
 
 <ol class="steps" role="list" style={`--n:${steps.length}`}>
@@ -15,7 +18,7 @@ const { steps } = Astro.props;
         <span class="step__marker" aria-hidden="true">
           <span class="step__dot" />
         </span>
-        <span class="step__num">Adım {String(i + 1).padStart(2, '0')}</span>
+        <span class="step__num">{ui.step} {String(i + 1).padStart(2, '0')}</span>
         <h3 class="step__title">{step.title}</h3>
         <p class="step__text">{step.text}</p>
       </li>

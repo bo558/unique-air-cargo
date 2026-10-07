@@ -1,0 +1,362 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import SectionHeader from '@/components/SectionHeader.astro';
+import ScenarioTabs from '@/components/ScenarioTabs.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Icon from '@/components/Icon.astro';
+import { getSectors } from '@/data/sectors';
+import { getService } from '@/data/services';
+import { projectImage } from '@/data/projects';
+import { pathTo, quoteHash, type Locale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+
+import ctaImage from '@/assets/images/turboprop-silhouette.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const sectors = getSectors(locale);
+const heroImage = projectImage('hong-kong-riyadh', 2);
+const context = sectors.find((s) => s.context)?.context;
+
+const copy = {
+  en: {
+    title: 'Industry Solutions',
+    description:
+      'Charter air transport solutions for energy, oil and gas, construction and infrastructure, aviation and marine, automotive and manufacturing, healthcare, government and humanitarian, and entertainment and sports.',
+    eyebrow: 'Industry solutions',
+    heroTitle: 'A team that knows',
+    heroAccent: 'the rhythm of your industry.',
+    lead: 'Every industry has its own urgency, cargo and rules. We shape our charter solutions around the real needs of each sector.',
+    heroAlt: 'Truck-mounted crane loading bridge components at Hong Kong airport',
+    gridEyebrow: 'Industries we serve',
+    gridTitle: 'Seven industries,',
+    gridAccent: 'one operations desk.',
+    gridLead: 'From energy fields to film sets — the sectors whose cargo, crews and deadlines we plan for.',
+    otherTitle: 'Your industry isn’t listed?',
+    otherText: 'Every charter starts with the cargo, the route and the deadline. Tell us yours.',
+    scenariosEyebrow: 'Operational scenarios',
+    scenariosTitle: 'How is it planned',
+    scenariosAccent: 'in practice?',
+    scenariosLead: 'Illustrative scenarios show step by step how a typical charter requirement is planned across different industries.',
+    ctaEyebrow: 'Tailored to your industry',
+    ctaTitle: 'Let’s keep your project',
+    ctaAccent: 'on schedule together.',
+  },
+  tr: {
+    title: 'Sektörel Çözümler',
+    description:
+      'Enerji, petrol ve gaz, inşaat ve altyapı, havacılık ve denizcilik, otomotiv ve üretim, sağlık, kamu ve insani yardım ile eğlence ve spor sektörleri için charter hava taşımacılığı çözümleri.',
+    eyebrow: 'Sektörel çözümler',
+    heroTitle: 'Sektörünüzün ritmini',
+    heroAccent: 'bilen bir ekip.',
+    lead: 'Her sektörün aciliyeti, yükü ve kuralları farklıdır. Charter çözümlerimizi sektörün gerçek ihtiyaçlarına göre kurguluyoruz.',
+    heroAlt: 'Hong Kong Havalimanı’nda köprü bileşenlerini yükleyen kamyon vinç',
+    gridEyebrow: 'Hizmet verdiğimiz sektörler',
+    gridTitle: 'Yedi sektör,',
+    gridAccent: 'tek operasyon masası.',
+    gridLead: 'Enerji sahalarından film setlerine — yükünü, ekibini ve takvimini planladığımız sektörler.',
+    otherTitle: 'Sektörünüz listede yok mu?',
+    otherText: 'Her charter; yük, rota ve teslim tarihiyle başlar. Sizinkini anlatın.',
+    scenariosEyebrow: 'Operasyon senaryoları',
+    scenariosTitle: 'Sahada nasıl',
+    scenariosAccent: 'kurgulanır?',
+    scenariosLead: 'Temsili senaryolar; farklı sektörlerdeki tipik bir charter ihtiyacının nasıl planlandığını adım adım gösterir.',
+    ctaEyebrow: 'Sektörünüze özel',
+    ctaTitle: 'Projenizin takvimini',
+    ctaAccent: 'birlikte koruyalım.',
+  },
+}[locale];
+---
+
+<BaseLayout title={copy.title} description={copy.description} image={heroImage}>
+  <PageHero
+    eyebrow={copy.eyebrow}
+    title={copy.heroTitle}
+    accent={copy.heroAccent}
+    lead={copy.lead}
+    image={heroImage}
+    imageAlt={copy.heroAlt}
+    crumbs={[{ label: ui.nav.industries }]}
+    size="compact"
+  />
+
+  <section class="section ind" aria-labelledby="ind-title">
+    <div class="container">
+      <SectionHeader id="ind-title" eyebrow={copy.gridEyebrow} title={copy.gridTitle} accent={copy.gridAccent} lead={copy.gridLead} layout="split" />
+
+      <ul class="ind__grid" role="list">
+        {
+          sectors.map((s, i) => (
+            <li class:list={['ind__item', i === 0 && 'ind__item--wide']} data-reveal style={`--reveal-delay:${(i % 3) * 70}`}>
+              <article class="sc-card" aria-labelledby={`sec-${s.id}`}>
+                <div class="sc-card__media">
+                  <Image src={s.image} alt={s.imageAlt} widths={[480, 720, 1000]} sizes={i === 0 ? '(min-width: 1024px) 60vw, 92vw' : '(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 92vw'} loading="lazy" />
+                  <span class="sc-card__num">{String(i + 1).padStart(2, '0')}</span>
+                </div>
+                <div class="sc-card__body">
+                  <h2 class="sc-card__title" id={`sec-${s.id}`}>{s.title}</h2>
+                  <p class="sc-card__text">{s.challenge}</p>
+                  <ul class="sc-card__links" role="list">
+                    {s.services.slice(0, 3).map((id) => {
+                      const svc = getService(locale, id);
+                      return svc ? (
+                        <li>
+                          <a href={svc.href}>{svc.navTitle}</a>
+                        </li>
+                      ) : null;
+                    })}
+                  </ul>
+                </div>
+              </article>
+            </li>
+          ))
+        }
+        <li class="ind__item ind__item--other" data-reveal>
+          <a href={pathTo(locale, 'contact', quoteHash[locale])} class="ind__other">
+            <span class="ind__other-title">{copy.otherTitle}</span>
+            <span class="ind__other-text">{copy.otherText}</span>
+            <span class="link-arrow">{ui.nav.requestQuote} <Icon name="arrow-right" /></span>
+          </a>
+        </li>
+      </ul>
+
+      {
+        context && (
+          <aside class="ind__context" data-reveal>
+            <p class="ind__context-label">{context.label}</p>
+            <p>{context.text}</p>
+          </aside>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section surface-white" aria-labelledby="scenarios-title">
+    <div class="container">
+      <SectionHeader
+        id="scenarios-title"
+        eyebrow={copy.scenariosEyebrow}
+        title={copy.scenariosTitle}
+        accent={copy.scenariosAccent}
+        lead={copy.scenariosLead}
+        layout="split"
+      />
+      <ScenarioTabs />
+    </div>
+  </section>
+
+  <CtaBand eyebrow={copy.ctaEyebrow} title={copy.ctaTitle} accent={copy.ctaAccent} image={ctaImage} />
+</BaseLayout>
+
+<style>
+  .ind__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.5rem 2rem;
+  }
+
+  .ind__item--wide {
+    grid-column: span 2;
+  }
+
+  .sc-card {
+    display: grid;
+    gap: 1.1rem;
+    height: 100%;
+  }
+
+  .sc-card__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--ink-800);
+  }
+
+  .ind__item--wide .sc-card {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .ind__item--wide .sc-card__media {
+    aspect-ratio: 16 / 11;
+  }
+
+  .sc-card__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+
+  .sc-card:hover .sc-card__media :global(img) {
+    transform: scale(1.04);
+  }
+
+  .sc-card__num {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    color: var(--white);
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  .sc-card__body {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding-top: 0.15rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+
+  .sc-card__title {
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+  }
+
+  .ind__item--wide .sc-card__title {
+    font-size: var(--fs-h3);
+  }
+
+  .sc-card__text {
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  .sc-card__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 0.35rem;
+  }
+
+  .sc-card__links a {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-600);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s;
+  }
+
+  .sc-card__links a:hover {
+    border-color: currentColor;
+  }
+
+  .ind__other {
+    display: grid;
+    align-content: end;
+    gap: 0.75rem;
+    height: 100%;
+    min-height: 14rem;
+    padding: 1.75rem;
+    background: var(--ink-900);
+    color: var(--text-inv);
+    transition: background-color 0.35s;
+  }
+
+  .ind__other:hover {
+    background: var(--ink-800);
+  }
+
+  .ind__other-title {
+    font-family: var(--font-serif);
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+  }
+
+  .ind__other-text {
+    font-size: var(--fs-small);
+    color: var(--text-inv-2);
+  }
+
+  .ind__other .link-arrow {
+    color: var(--brand-300);
+  }
+
+  .ind__context {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    gap: 1rem 2rem;
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-small);
+    color: var(--text-2);
+  }
+
+  .ind__context-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-600);
+  }
+
+  @media (max-width: 1023px) {
+    .ind__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ind__item--wide .sc-card {
+      grid-template-columns: 1fr;
+      gap: 1.1rem;
+    }
+
+    .ind__item--wide .sc-card__media {
+      aspect-ratio: 21 / 10;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .ind__grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .ind__item--wide {
+      grid-column: auto;
+    }
+
+    .sc-card,
+    .ind__item--wide .sc-card {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .sc-card__media,
+    .ind__item--wide .sc-card__media {
+      aspect-ratio: 1;
+    }
+
+    .sc-card__body {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .ind__item--wide .sc-card__title {
+      font-size: var(--fs-h4);
+    }
+
+    .ind__other {
+      min-height: 0;
+    }
+
+    .ind__context {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

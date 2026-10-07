@@ -5,6 +5,11 @@ import type { ImageMetadata } from 'astro';
 import Icon from './Icon.astro';
 import { site } from '@/data/site';
 import defaultImage from '@/assets/images/wing-clouds.jpg';
+import { getLocale, pathTo, quoteHash } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+
+const locale = getLocale(Astro.url);
+const ui = t(locale);
 
 interface Props {
   eyebrow?: string;
@@ -17,13 +22,13 @@ interface Props {
 }
 
 const {
-  eyebrow = 'Teklif & Planlama',
-  title = 'Bir sonraki operasyonunuzu',
-  accent = 'birlikte planlayalım.',
-  text = 'Rota, tarih ve yük ya da yolcu bilgilerinizi paylaşın; uygun uçak seçeneklerini ve net bir teklifi en kısa sürede iletelim.',
+  eyebrow = ui.cta.eyebrow,
+  title = ui.cta.title,
+  accent = ui.cta.accent,
+  text = ui.cta.text,
   image = defaultImage,
-  primaryLabel = 'Teklif Al',
-  primaryHref = '/iletisim#teklif',
+  primaryLabel = ui.nav.requestQuote,
+  primaryHref = pathTo(locale, 'contact', quoteHash[locale]),
 } = Astro.props;
 ---
 
@@ -47,20 +52,20 @@ const {
       <p class="cta__text">{text}</p>
       <div class="btn-row">
         <a href={withBase(primaryHref)} class="btn btn--light">{primaryLabel} <Icon name="arrow-right" /></a>
-        <a href={withBase('/iletisim')} class="btn btn--ghost-light">Bizimle İletişime Geçin</a>
+        <a href={pathTo(locale, 'contact')} class="btn btn--ghost-light">{ui.cta.contactUs}</a>
       </div>
     </div>
     <dl class="cta__contact" data-reveal style="--reveal-delay:150">
       <div>
-        <dt>Telefon</dt>
+        <dt>{ui.cta.phone}</dt>
         <dd><a href={site.contact.phoneHref}>{site.contact.phone}</a></dd>
       </div>
       <div>
-        <dt>E-posta</dt>
+        <dt>{ui.cta.email}</dt>
         <dd><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></dd>
       </div>
       <div>
-        <dt>Merkez</dt>
+        <dt>{ui.cta.office}</dt>
         <dd>{site.contact.address.district}, {site.contact.address.city}</dd>
       </div>
     </dl>
@@ -91,6 +96,11 @@ const {
       linear-gradient(to top, rgba(5, 9, 15, 0.6), transparent 50%);
   }
 
+  .cta__media :global(picture) {
+    display: block;
+    height: 100%;
+  }
+
   .cta__media :global(img) {
     width: 100%;
     height: 100%;
@@ -102,7 +112,7 @@ const {
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
     align-items: end;
     gap: 3rem 5rem;
-    padding-block: clamp(5.5rem, 4rem + 7vw, 10rem);
+    padding-block: clamp(4.5rem, 3.2rem + 5vw, 8rem);
   }
 
   .cta__title {

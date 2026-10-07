@@ -1,10 +1,14 @@
 ---
-import { withBase } from '@/utils/paths';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { site } from '@/data/site';
-import { services, serviceHref } from '@/data/services';
+import { getServices } from '@/data/services';
+import { getLocale, pathTo, quoteHash } from '@/i18n/config';
+import { t } from '@/i18n/ui';
 
+const locale = getLocale(Astro.url);
+const ui = t(locale);
+const services = getServices(locale);
 const cargo = services.filter((s) => s.category === 'kargo');
 const other = services.filter((s) => s.category !== 'kargo');
 const year = new Date().getFullYear();
@@ -15,41 +19,39 @@ const { address } = site.contact;
   <div class="container">
     <div class="footer__top">
       <div class="footer__brand">
-        <a href={withBase('/')} aria-label="Unique Air Cargo — Ana sayfa"><Logo variant="white" width={176} /></a>
-        <p class="footer__claim">
-          İstanbul merkezli; kargo, yolcu ve özel operasyonlar için charter uçak kiralama çözümleri sunan havacılık
-          şirketi.
-        </p>
+        <a href={pathTo(locale, 'home')} aria-label={ui.homeAria}><Logo variant="white" width={164} /></a>
+        <p class="footer__claim">{ui.footer.claim}</p>
         <p class="footer__motto">Above All, <em>We Care.</em></p>
       </div>
 
-      <nav class="footer__nav" aria-label="Alt menü">
+      <nav class="footer__nav" aria-label={ui.footer.navLabel}>
         <div class="footer__col">
-          <p class="footer__heading">Kargo & Özel Yük</p>
+          <p class="footer__heading">{ui.footer.cargo}</p>
           <ul role="list">
-            {cargo.map((s) => <li><a href={serviceHref(s.slug)}>{s.navTitle}</a></li>)}
+            {cargo.map((s) => <li><a href={s.href}>{s.navTitle}</a></li>)}
           </ul>
         </div>
         <div class="footer__col">
-          <p class="footer__heading">Yolcu & Kurum</p>
+          <p class="footer__heading">{ui.footer.other}</p>
           <ul role="list">
-            {other.map((s) => <li><a href={serviceHref(s.slug)}>{s.navTitle}</a></li>)}
+            {other.map((s) => <li><a href={s.href}>{s.navTitle}</a></li>)}
           </ul>
         </div>
         <div class="footer__col">
-          <p class="footer__heading">Şirket</p>
+          <p class="footer__heading">{ui.footer.company}</p>
           <ul role="list">
-            <li><a href={withBase('/kurumsal')}>Kurumsal</a></li>
-            <li><a href={withBase('/hizmetler')}>Hizmetlerimiz</a></li>
-            <li><a href={withBase('/sektorler')}>Sektörler</a></li>
-            <li><a href={withBase('/iletisim')}>İletişim</a></li>
-            <li><a href={withBase('/iletisim#teklif')}>Teklif Al</a></li>
+            <li><a href={pathTo(locale, 'about')}>{ui.nav.about}</a></li>
+            <li><a href={pathTo(locale, 'services')}>{ui.nav.services}</a></li>
+            <li><a href={pathTo(locale, 'industries')}>{ui.nav.industries}</a></li>
+            <li><a href={pathTo(locale, 'projects')}>{ui.nav.projects}</a></li>
+            <li><a href={pathTo(locale, 'contact')}>{ui.nav.contact}</a></li>
+            <li><a href={pathTo(locale, 'contact', quoteHash[locale])}>{ui.nav.requestQuote}</a></li>
           </ul>
         </div>
       </nav>
 
       <address class="footer__contact">
-        <p class="footer__heading">İletişim</p>
+        <p class="footer__heading">{ui.footer.contact}</p>
         <a href={site.contact.phoneHref} class="footer__big">{site.contact.phone}</a>
         <a href={`mailto:${site.contact.email}`} class="footer__mail">{site.contact.email}</a>
         <a href={site.contact.mapsUrl} target="_blank" rel="noopener" class="footer__addr">
@@ -61,10 +63,11 @@ const { address } = site.contact;
     </div>
 
     <div class="footer__bottom">
-      <p>© {year} {site.legalName}. Tüm hakları saklıdır.</p>
+      <p>© {year} {site.legalName}. {ui.footer.rights}</p>
       <ul role="list" class="footer__legal">
-        <li><a href={withBase('/kvkk')}>KVKK Aydınlatma Metni</a></li>
-        <li><span class="mono">İstanbul · TR</span></li>
+        <li><a href={pathTo(locale, 'privacy')}>{ui.footer.privacy}</a></li>
+        <li><span class="mono">Istanbul · TR</span></li>
+        <li class="footer__credit">{ui.footer.designBy} <span>COGROS</span></li>
       </ul>
     </div>
   </div>
@@ -94,7 +97,7 @@ const { address } = site.contact;
   .footer__motto {
     margin-top: 2rem;
     font-family: var(--font-serif);
-    font-size: 1.6rem;
+    font-size: 1.35rem;
     letter-spacing: -0.02em;
     color: var(--text-inv);
   }
@@ -145,7 +148,7 @@ const { address } = site.contact;
 
   .footer__big {
     font-family: var(--font-serif);
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     letter-spacing: -0.01em;
     font-variant-numeric: tabular-nums;
     color: var(--text-inv);
@@ -181,7 +184,8 @@ const { address } = site.contact;
 
   .footer__legal {
     display: flex;
-    gap: 1.75rem;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
   }
 
   @media (max-width: 1100px) {
@@ -208,5 +212,18 @@ const { address } = site.contact;
     .footer__nav .footer__col:last-child {
       grid-column: 1 / -1;
     }
+  }
+
+  .footer__credit {
+    font-size: var(--fs-xs);
+    color: var(--text-inv-3);
+    letter-spacing: 0.02em;
+  }
+
+  .footer__credit span {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    color: var(--text-inv-2);
   }
 </style>

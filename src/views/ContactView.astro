@@ -1,0 +1,415 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import QuoteForm from '@/components/QuoteForm.astro';
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+import { quoteHash, type Locale } from '@/i18n/config';
+import { t } from '@/i18n/ui';
+import heroImage from '@/assets/images/sunset-sky-plane.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const { address } = site.contact;
+
+const copy = {
+  en: {
+    title: 'Contact & Quotes',
+    description: `Contact Unique Air Cargo: charter quote request form, ${site.contact.phone}, ${site.contact.email}. Head office: ${address.street}, ${address.district} / Istanbul, Türkiye.`,
+    eyebrow: 'Contact',
+    heroTitle: 'Let’s talk about',
+    heroAccent: 'your next operation.',
+    lead: 'Reach our team directly to request a quote, plan an operation or simply explore your options.',
+    heroAlt: 'Passenger aircraft flying through orange clouds',
+    sectionLabel: 'Contact details and quote form',
+    infoTitle: 'Contact details',
+    phoneNote: 'Call us directly for urgent and time-critical requests. Air ambulance requests 24/7.',
+    office: 'Head office',
+    country: 'Istanbul / Türkiye',
+    directions: 'Get directions',
+    mapText: 'Load Google Maps to view the map.',
+    mapButton: 'Load map',
+    mapFine: 'Google may set cookies once the map is loaded.',
+    mapTitle: 'Unique Air Cargo head office location',
+    formEyebrow: 'Quote request',
+    formTitle: 'Tell us about',
+    formAccent: 'your requirement.',
+    formLead: 'Fill in the form and our team will review suitable options and get back to you shortly.',
+    faqEyebrow: 'Frequently asked questions',
+    faqTitle: 'Good to know',
+    faqAccent: 'before you start.',
+    faqs: [
+      {
+        q: 'What information do you need for a quote?',
+        a: 'Origin and destination, preferred date, and the dimensions, weight and type of the cargo — or, for passenger flights, the number of passengers and any special requests. If some details are missing, that’s fine: our team will complete them with you.',
+      },
+      {
+        q: 'I have an urgent request. What is the fastest way to reach you?',
+        a: `For urgent and time-critical operations, call us directly on ${site.contact.phone}. For air ambulance requests we are available 24/7.`,
+      },
+      {
+        q: 'Which regions do you cover?',
+        a: 'Our Istanbul head office works with local representatives in Europe, the CIS, Russia, Africa, the Middle East, the Far East and the USA to deliver charter solutions on seven continents.',
+      },
+      {
+        q: 'Do you handle dangerous goods or shipments that need special permits?',
+        a: 'Yes. Our team, trained in the IATA Dangerous Goods Regulations, reviews the acceptability of each shipment and coordinates processes requiring diplomatic or special permits.',
+      },
+    ],
+  },
+  tr: {
+    title: 'İletişim ve Teklif',
+    description: `Unique Air Cargo ile iletişime geçin: charter teklif formu, ${site.contact.phone}, ${site.contact.email}. Merkez: ${address.street}, ${address.district} / ${address.city}.`,
+    eyebrow: 'İletişim',
+    heroTitle: 'Bir sonraki operasyonunuzu',
+    heroAccent: 'konuşalım.',
+    lead: 'Teklif almak, bir operasyonu planlamak ya da yalnızca seçenekleri değerlendirmek için ekibimize doğrudan ulaşın.',
+    heroAlt: 'Turuncu bulutların arasında uçan yolcu uçağı',
+    sectionLabel: 'İletişim bilgileri ve teklif formu',
+    infoTitle: 'İletişim bilgileri',
+    phoneNote: 'Acil ve kritik zamanlı talepler için doğrudan arayın. Ambulans uçak talepleri 7/24.',
+    office: 'Merkez ofis',
+    country: `${address.city} / ${address.country}`,
+    directions: 'Yol tarifi al',
+    mapText: 'Haritayı görüntülemek için Google Haritalar içeriğini yükleyin.',
+    mapButton: 'Haritayı yükle',
+    mapFine: 'Yüklendiğinde Google çerezleri kullanılabilir.',
+    mapTitle: 'Unique Air Cargo merkez ofis konumu',
+    formEyebrow: 'Teklif talep formu',
+    formTitle: 'Talebinizi',
+    formAccent: 'paylaşın.',
+    formLead: 'Formu doldurun; ekibimiz uygun seçenekleri değerlendirerek size en kısa sürede dönüş yapsın.',
+    faqEyebrow: 'Sık sorulan sorular',
+    faqTitle: 'Başlamadan önce',
+    faqAccent: 'bilmeniz gerekenler.',
+    faqs: [
+      {
+        q: 'Teklif için hangi bilgilere ihtiyacınız var?',
+        a: 'Kalkış ve varış noktası, planlanan tarih ve yükün ölçü, ağırlık ve türü; yolcu uçuşlarında ise kişi sayısı ve özel talepler. Bilgileriniz eksikse sorun değil, ekibimiz gerekli detayları sizinle birlikte tamamlar.',
+      },
+      {
+        q: 'Acil bir talebim var, en hızlı nasıl ulaşırım?',
+        a: `Acil ve kritik zamanlı operasyonlar için bizi doğrudan ${site.contact.phone} numarasından arayabilirsiniz. Ambulans uçak talepleri için 7/24 ulaşılabiliriz.`,
+      },
+      {
+        q: 'Hangi bölgelerde hizmet veriyorsunuz?',
+        a: 'İstanbul’daki merkezimiz; Avrupa, BDT ülkeleri, Rusya, Afrika, Orta Doğu, Uzak Doğu ve ABD’deki yerel temsilcilerimizle birlikte yedi kıtada charter çözümleri sunar.',
+      },
+      {
+        q: 'Tehlikeli madde veya özel izin gerektiren yükleri taşıyor musunuz?',
+        a: 'Evet. IATA Tehlikeli Madde Regülasyonları konusunda eğitimli ekibimiz, gönderinin uygunluğunu değerlendirir ve diplomatik ya da özel izin gerektiren süreçleri koordine eder.',
+      },
+    ],
+  },
+}[locale];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: copy.faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<BaseLayout title={copy.title} description={copy.description} image={heroImage} jsonLd={faqSchema}>
+  <PageHero
+    eyebrow={copy.eyebrow}
+    title={copy.heroTitle}
+    accent={copy.heroAccent}
+    lead={copy.lead}
+    image={heroImage}
+    imageAlt={copy.heroAlt}
+    crumbs={[{ label: ui.nav.contact }]}
+    size="compact"
+  />
+
+  <section class="section contact" aria-label={copy.sectionLabel}>
+    <div class="container contact__grid">
+      <aside class="contact__info" aria-labelledby="info-title">
+        <h2 class="visually-hidden" id="info-title">{copy.infoTitle}</h2>
+
+        <div class="info__block" data-reveal>
+          <p class="info__label">{ui.nav.charterLine}</p>
+          <a href={site.contact.phoneHref} class="info__big">{site.contact.phone}</a>
+          <p class="info__note">{copy.phoneNote}</p>
+        </div>
+
+        <div class="info__block" data-reveal style="--reveal-delay:80">
+          <p class="info__label">{ui.cta.email}</p>
+          <a href={`mailto:${site.contact.email}`} class="info__mail">{site.contact.email}</a>
+        </div>
+
+        <div class="info__block" data-reveal style="--reveal-delay:160">
+          <p class="info__label">{copy.office}</p>
+          <address>
+            {address.street}<br />
+            {address.postalCode} {address.district}<br />
+            {copy.country}
+          </address>
+          <a href={site.contact.mapsUrl} target="_blank" rel="noopener" class="link-arrow">
+            {copy.directions} <Icon name="arrow-up-right" />
+          </a>
+        </div>
+
+        <div class="map" data-map data-src={site.contact.mapsEmbed} data-title={copy.mapTitle} data-reveal style="--reveal-delay:220">
+          <div class="map__placeholder">
+            <Icon name="pin" size={28} />
+            <p>{copy.mapText}</p>
+            <button type="button" class="btn btn--sm btn--ink" data-map-load>{copy.mapButton}</button>
+            <p class="map__fine">{copy.mapFine}</p>
+          </div>
+        </div>
+      </aside>
+
+      <div class="contact__form" id={quoteHash[locale].slice(1)} aria-labelledby="form-title">
+        <div class="form__head" data-reveal>
+          <p class="eyebrow">{copy.formEyebrow}</p>
+          <h2 class="h2" id="form-title">{copy.formTitle} <em>{copy.formAccent}</em></h2>
+          <p class="lead">{copy.formLead}</p>
+        </div>
+        <QuoteForm />
+      </div>
+    </div>
+  </section>
+
+  <section class="section surface-white" aria-labelledby="faq-title">
+    <div class="container faq">
+      <div data-reveal>
+        <p class="eyebrow">{copy.faqEyebrow}</p>
+        <h2 class="h2 faq__title" id="faq-title">{copy.faqTitle} <em>{copy.faqAccent}</em></h2>
+      </div>
+      <div class="faq__list">
+        {
+          copy.faqs.map((f, i) => (
+            <details class="faq__item" data-reveal style={`--reveal-delay:${i * 60}`} open={i === 0}>
+              <summary>
+                <span>{f.q}</span>
+                <Icon name="plus" size={20} class="faq__icon" />
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    gap: 4rem clamp(3rem, 7vw, 8rem);
+    align-items: start;
+  }
+
+  .contact__info {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    display: grid;
+    gap: 0;
+  }
+
+  .info__block {
+    display: grid;
+    justify-items: start;
+    gap: 0.5rem;
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .info__label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .info__big {
+    font-family: var(--font-serif);
+    font-size: clamp(1.55rem, 1.3rem + 0.8vw, 2rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.25s;
+  }
+
+  .info__big:hover,
+  .info__mail:hover {
+    color: var(--brand-600);
+  }
+
+  .info__mail {
+    font-size: 1.125rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    transition: color 0.25s;
+  }
+
+  .info__note {
+    font-size: var(--fs-small);
+    color: var(--text-2);
+  }
+
+  .info__block address {
+    font-style: normal;
+    color: var(--text-2);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .map {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    margin-top: 0.5rem;
+    background:
+      linear-gradient(rgba(10, 18, 32, 0.035) 1px, transparent 1px) 0 0 / 22px 22px,
+      linear-gradient(90deg, rgba(10, 18, 32, 0.035) 1px, transparent 1px) 0 0 / 22px 22px,
+      var(--paper-2);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .map :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .map__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.85rem;
+    padding: 1.5rem;
+    text-align: center;
+    font-size: var(--fs-small);
+    color: var(--text-2);
+  }
+
+  .map__placeholder :global(svg) {
+    color: var(--brand);
+  }
+
+  .map__fine {
+    font-size: var(--fs-xs);
+    color: var(--text-3);
+  }
+
+  .form__head {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+  }
+
+  .form__head .h2 em {
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  .contact__form {
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+
+  @media (max-width: 1023px) {
+    .contact__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contact__info {
+      position: static;
+      order: 2;
+    }
+  }
+
+  /* FAQ */
+  .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 3rem clamp(3rem, 7vw, 8rem);
+  }
+
+  .faq__title {
+    margin-top: 1.25rem;
+  }
+
+  .faq__title em {
+    display: block;
+    font-weight: 300;
+    color: var(--brand-600);
+  }
+
+  .faq__item {
+    border-top: 1px solid var(--line);
+  }
+
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faq__item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.4rem 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.05rem, 1rem + 0.25vw, 1.2rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__item summary :global(.faq__icon) {
+    flex: none;
+    color: var(--brand);
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .faq__item[open] summary :global(.faq__icon) {
+    transform: rotate(45deg);
+  }
+
+  .faq__item p {
+    max-width: 62ch;
+    padding-bottom: 1.6rem;
+    color: var(--text-2);
+  }
+
+  @media (max-width: 899px) {
+    .faq {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-map]').forEach((map) => {
+    map.querySelector('[data-map-load]')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = map.dataset.src ?? '';
+      iframe.title = map.dataset.title ?? '';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      map.querySelector('.map__placeholder')?.remove();
+      map.appendChild(iframe);
+    });
+  });
+</script>

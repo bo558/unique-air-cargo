@@ -1,10 +1,9 @@
+import type { Locale } from '@/i18n/config';
+import { scenariosEn } from './scenarios.en';
 import type { ImageMetadata } from 'astro';
+import { projectImage } from './projects';
 
-import imgApronSunset from '@/assets/images/apron-sunset.jpg';
-import imgEngine from '@/assets/images/engine.jpg';
-import imgUldApron from '@/assets/images/uld-apron.jpg';
 import imgNightApproach from '@/assets/images/night-approach.jpg';
-import imgPalletsApron from '@/assets/images/pallets-apron.jpg';
 
 /**
  * Representative scenarios that illustrate when and how a charter is planned.
@@ -23,7 +22,14 @@ export interface Scenario {
   imageAlt: string;
 }
 
-export const scenarios: Scenario[] = [
+const uac = {
+  site: projectImage('afghanistan-prefabricated-hospital', 3),
+  engine: projectImage('london-istanbul-aircraft-engine', 1),
+  parts: projectImage('istanbul-niamey-gold-exploration', 6),
+  relief: projectImage('afghanistan-prefabricated-hospital', 4),
+};
+
+const scenariosTr: Scenario[] = [
   {
     id: 'altyapi',
     tab: 'Altyapı projesi',
@@ -35,8 +41,8 @@ export const scenarios: Scenario[] = [
     approach:
       'Ölçü ve ağırlığa göre uçak tipi belirlenir, varış havalimanında yükleme ekipmanı teyit edilir; uçuş ve iniş izinleri ile havalimanından sahaya karayolu transferi aynı plan içinde eşlenir.',
     services: ['agir-yuk-charter', 'acil-kritik-zamanli-charter'],
-    image: imgApronSunset,
-    imageAlt: 'Gün batımında yük ve yer hizmeti araçlarıyla dolu apron',
+    image: uac.site,
+    imageAlt: 'Ağır nakliye uçağına vinçle yüklenen büyük hacimli modül',
   },
   {
     id: 'aog',
@@ -49,8 +55,8 @@ export const scenarios: Scenario[] = [
     approach:
       'Motorun taşıma kızağıyla birlikte ölçüsü ve ağırlığı alınır; ana güverte kapısı uygun uçak seçenekleri karşılaştırılır, varışta gümrük ve teslim süreci uçuştan önce hazırlanır.',
     services: ['acil-kritik-zamanli-charter', 'agir-yuk-charter'],
-    image: imgEngine,
-    imageAlt: 'Apronda turbofan jet motoru',
+    image: uac.engine,
+    imageAlt: 'Ağır nakliye uçağına yüklenen uçak motoru',
   },
   {
     id: 'uretim',
@@ -63,8 +69,8 @@ export const scenarios: Scenario[] = [
     approach:
       'Yükün hacmine göre en uygun boyutta uçak seçilir, teslim alma noktasından havalimanına transfer koordine edilir ve operasyon boyunca durum bildirimi yapılır.',
     services: ['acil-kritik-zamanli-charter', 'kargo-charter'],
-    image: imgUldApron,
-    imageAlt: 'Apronda uçağa yüklenmeyi bekleyen kargo konteynerleri',
+    image: uac.parts,
+    imageAlt: 'Hava kargo için hazırlanmış endüstriyel ekipman parçaları',
   },
   {
     id: 'hasta',
@@ -91,7 +97,10 @@ export const scenarios: Scenario[] = [
     approach:
       'Yardım kuruluşlarıyla yük listesi netleştirilir, yükleme planı yapılır; acil uçuş izinleri takip edilerek tekrarlayan uçuşlarla bir yardım köprüsü kurulur.',
     services: ['yardim-malzemesi-charter', 'kargo-charter'],
-    image: imgPalletsApron,
-    imageAlt: 'Apronda uçağa yüklenmeyi bekleyen paletlenmiş malzemeler',
+    image: uac.relief,
+    imageAlt: 'Kargo ambarında prefabrik modül',
   },
 ];
+
+export const getScenarios = (locale: Locale): Scenario[] =>
+  locale === 'tr' ? scenariosTr : scenariosTr.map((s) => ({ ...s, ...scenariosEn[s.id] }));
