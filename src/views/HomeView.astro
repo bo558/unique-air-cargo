@@ -11,8 +11,9 @@ import { site } from '@/data/site';
 import { pathTo, quoteHash, type Locale } from '@/i18n/config';
 import { t } from '@/i18n/ui';
 import ProjectCard from '@/components/ProjectCard.astro';
-import { getProjects, projectImage } from '@/data/projects';
+import { getProjects } from '@/data/projects';
 
+import heroImage from '@/assets/images/hero-freighter-night.jpg';
 import ctaImage from '@/assets/images/night-approach.jpg';
 
 interface Props {
@@ -21,14 +22,13 @@ interface Props {
 
 const { locale } = Astro.props;
 const ui = t(locale);
-const heroImage = projectImage('ataturk-airport-last-flight', 2);
 const featured = getProjects(locale).slice(0, 3);
 
 const copy = {
   en: {
     description:
       'Unique Air Cargo is an Istanbul-based aircraft charter company. Cargo, heavy and outsized freight, dangerous goods, time-critical, VIP jet, group and air ambulance flights, backed by local representatives in seven regions.',
-    heroAlt: 'Heavy-lift freighter on the apron at sunset',
+    heroAlt: 'Wide-body aircraft being serviced on the apron at night',
     eyebrow: 'Cargo & passenger charter · Istanbul',
     title: 'The right aircraft in the air,',
     accent: 'the right team on the ground.',
@@ -93,7 +93,7 @@ const copy = {
   tr: {
     description:
       'Unique Air Cargo; İstanbul merkezli charter uçak kiralama şirketi. Kargo, ağır ve büyük hacimli yük, tehlikeli madde, acil sevkiyat, VIP jet, grup ve ambulans uçuşları için 7 bölgede yerel temsilci ağıyla global çözümler.',
-    heroAlt: 'Gün batımında apronda bekleyen ağır nakliye uçağı',
+    heroAlt: 'Gece apronda hizmet verilen geniş gövdeli uçak',
     eyebrow: 'Kargo & yolcu charter · İstanbul',
     title: 'Gökyüzünde doğru uçak,',
     accent: 'yerde doğru ekip.',
