@@ -27,6 +27,17 @@ Notlar:
 - Önizleme derlemesi (`PUBLIC_PREVIEW=true`) tüm sayfalara `noindex` ekler ve `robots.txt` ile tarayıcıları engeller; gerçek alan adına geçerken workflow'dan bu satırı kaldırın.
 - Koddaki tüm iç bağlantılar `src/utils/paths.ts` içindeki `withBase()` üzerinden geçer; yeni bağlantı eklerken bunu kullanın.
 
+## cPanel (uniqueaircargo.com — production)
+
+```bash
+npm run build:cpanel   # kök dizin + https://uniqueaircargo.com için derler, dist/.htaccess üretir ve çıktıyı doğrular
+```
+
+- `SITE_URL`, `BASE_PATH`, `PUBLIC_PREVIEW` ortam değişkenleri **tanımlı olmamalı**; tanımlıysa kontrol adımı derlemeyi durdurur.
+- `dist/` içeriği (`.htaccess` dahil) `public_html/` köküne yüklenir.
+- `.htaccess` uzantısız adresleri (`/tr/kurumsal` → `tr/kurumsal.html`) çözer, `www` → çıplak alan adına yönlendirir.
+- HTTP → HTTPS yönlendirmesi SSL sertifikası aktif olmadan siteyi kapatacağı için yorum satırı olarak gelir; AutoSSL tamamlanınca `.htaccess` içindeki ilgili üç satırın başındaki `# ` silinir (ya da `FORCE_HTTPS=true npm run build:cpanel`).
+
 ## Yapı
 
 ```

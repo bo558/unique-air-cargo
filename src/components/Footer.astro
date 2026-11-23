@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Logo from './Logo.astro';
+import cogros from '@/assets/brand/cogros-white.png';
 import Icon from './Icon.astro';
 import { site } from '@/data/site';
 import { getServices } from '@/data/services';
@@ -59,6 +61,20 @@ const { address } = site.contact;
           {address.postalCode} {address.district} / {address.city}
           <Icon name="arrow-up-right" size={14} />
         </a>
+        {site.social.length > 0 && (
+          <div class="footer__social">
+            <p class="footer__heading">{ui.footer.follow}</p>
+            <ul role="list">
+              {site.social.map((s) => (
+                <li>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer me" aria-label={ui.footer.socialAria.replace('%s', s.label)}>
+                    <Icon name={s.id as 'linkedin' | 'instagram'} size={20} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </address>
     </div>
 
@@ -67,7 +83,12 @@ const { address } = site.contact;
       <ul role="list" class="footer__legal">
         <li><a href={pathTo(locale, 'privacy')}>{ui.footer.privacy}</a></li>
         <li><span class="mono">Istanbul · TR</span></li>
-        <li class="footer__credit">{ui.footer.designBy} <span>COGROS</span></li>
+        <li class="footer__credit">
+          {ui.footer.designBy}
+          <a href="https://cogros.com" target="_blank" rel="noopener" class="footer__cogros">
+            <Image src={cogros} alt="COGROS" width={180} loading="lazy" decoding="async" />
+          </a>
+        </li>
       </ul>
     </div>
   </div>
@@ -170,6 +191,36 @@ const { address } = site.contact;
     margin-left: 0.25rem;
   }
 
+  .footer__social {
+    margin-top: 1.5rem;
+  }
+
+  .footer__social .footer__heading {
+    margin-bottom: 0.75rem;
+  }
+
+  .footer__social ul {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .footer__social a {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--line-inv);
+    border-radius: 50%;
+    color: var(--text-inv-2);
+    transition: color 0.25s, border-color 0.25s;
+  }
+
+  .footer__social a:hover,
+  .footer__social a:focus-visible {
+    color: var(--white);
+    border-color: var(--text-inv-2);
+  }
+
   .footer__bottom {
     display: flex;
     flex-wrap: wrap;
@@ -220,10 +271,27 @@ const { address } = site.contact;
     letter-spacing: 0.02em;
   }
 
-  .footer__credit span {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
-    color: var(--text-inv-2);
+  .footer__credit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  /* Same weight as the footer's secondary text; full white on hover like the other footer links */
+  .footer__cogros {
+    display: block;
+    opacity: 0.72;
+    transition: opacity 0.25s;
+  }
+
+  .footer__cogros:hover,
+  .footer__cogros:focus-visible {
+    opacity: 1;
+  }
+
+  .footer__cogros img {
+    display: block;
+    width: 90px;
+    height: auto;
   }
 </style>

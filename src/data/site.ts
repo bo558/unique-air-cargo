@@ -2,7 +2,7 @@ export const site = {
   name: 'Unique Air Cargo',
   legalName: 'Unique Air Cargo',
   tagline: 'Above All, We Care',
-  url: 'https://www.uniqueaircargo.com',
+  url: 'https://uniqueaircargo.com',
   locale: 'tr_TR',
   defaultDescription:
     'Unique Air Cargo; İstanbul merkezli, kargo, yolcu ve özel operasyonlar için charter uçak kiralama hizmeti sunan havacılık şirketidir. Ağır yük, tehlikeli madde, acil sevkiyat, VIP jet ve ambulans uçak çözümleri.',
@@ -21,6 +21,11 @@ export const site = {
     mapsEmbed:
       'https://www.google.com/maps?q=Cafera%C4%9Fa+Mahallesi+%C5%9Eifa+Sokak+No:19+Kad%C4%B1k%C3%B6y+%C4%B0stanbul&output=embed',
   },
+  /** Official social profiles. Single source for the footer icons and the JSON-LD `sameAs` list. */
+  social: [
+    { id: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/company/uniqueaircargo' },
+    { id: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/uniqueaircargo/' },
+  ],
   /** Regions where the company states it has local representation (source: uniqueaircargo.com/hakkimizda). */
   regions: ['Avrupa', 'BDT Ülkeleri', 'Rusya', 'Afrika', 'Orta Doğu', 'Uzak Doğu', 'ABD'],
 } as const;

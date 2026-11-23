@@ -37,6 +37,8 @@ export const ui = {
       rights: 'All rights reserved.',
       privacy: 'Privacy Notice',
       designBy: 'Design by',
+      follow: 'Follow us',
+      socialAria: 'Unique Air Cargo on %s',
     },
     crumbs: { label: 'Breadcrumb', home: 'Home' },
     cta: {
@@ -166,6 +168,8 @@ export const ui = {
       rights: 'Tüm hakları saklıdır.',
       privacy: 'KVKK Aydınlatma Metni',
       designBy: 'Design by',
+      follow: 'Bizi takip edin',
+      socialAria: 'Unique Air Cargo %s sayfası',
     },
     crumbs: { label: 'Sayfa konumu', home: 'Ana Sayfa' },
     cta: {
